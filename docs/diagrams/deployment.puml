@@ -1,0 +1,42 @@
+@startuml
+!pragma layout smetana
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName DejaVu Sans
+skinparam defaultFontSize 16
+skinparam ArrowColor #087C61
+skinparam ClassBorderColor #087C61
+skinparam ClassBackgroundColor #EAF7ED
+skinparam ActorBorderColor #192D3D
+skinparam UsecaseBackgroundColor #EAF7ED
+skinparam UsecaseBorderColor #087C61
+skinparam ActivityBackgroundColor #EAF7ED
+skinparam ActivityBorderColor #087C61
+skinparam ParticipantBackgroundColor #EAF7ED
+skinparam ParticipantBorderColor #087C61
+skinparam NoteBackgroundColor #FFF6DF
+skinparam NoteBorderColor #C5AB62
+skinparam roundcorner 8
+skinparam dpi 160
+top to bottom direction
+node "Local workstation" {
+ node "Browser" as Browser
+ node "Python process" {
+  component "Django runserver\nHTML, sessions, DRF, static files" as Django
+  component "scikit-learn + on-demand SHAP" as ML
+ }
+ database "db.sqlite3" as DB
+ artifact "registry/version/model.joblib" as Artifact
+ artifact ".env\nlocal secret and encryption key" as Env
+}
+Browser --> Django : HTTP 127.0.0.1:8000
+Django --> DB : ORM
+Django --> ML : in-process call
+ML --> Artifact : load
+Django ..> Env : settings
+note bottom of Django
+Local demonstration topology.
+Docker/PostgreSQL is configured but deployment remains unverified.
+No production HTTPS or uptime claim.
+end note
+@enduml

@@ -1,0 +1,38 @@
+{
+  "model_version": "simulated_rf_v2",
+  "artifact_sha256": "beac42441cfdea718743d23e7458deba620c9abf0e72a03332fe0f7948f74085",
+  "manifest_sha256": "c105330ec2dcbccda6c139f902acdced6710095acc7be9423ce6cd5c7e5bd696",
+  "records": 2000,
+  "record_source": "held-out simulated test split (split_membership.csv)",
+  "baseline_probability": 0.4992,
+  "mean_test_probability": 0.479123,
+  "mean_absolute_shap": {
+    "income_per_capita": 0.184577,
+    "monthly_income": 0.125336,
+    "employment_status": 0.120727,
+    "water_access": 0.04065,
+    "distance_to_market_km": 0.02917,
+    "children_under_5": 0.018906,
+    "has_chronic_illness": 0.018644,
+    "land_ownership": 0.016259,
+    "num_dependents": 0.013923,
+    "has_disabled_member": 0.012005,
+    "household_size": 0.007047,
+    "elderly_members": 0.004354
+  },
+  "mean_shap": {
+    "monthly_income": 0.002814,
+    "income_per_capita": -0.000946,
+    "household_size": -0.001546,
+    "num_dependents": -0.000229,
+    "children_under_5": -0.001065,
+    "elderly_members": -0.000685,
+    "distance_to_market_km": -0.001423,
+    "has_disabled_member": -0.00169,
+    "has_chronic_illness": -0.001757,
+    "land_ownership": -0.000947,
+    "employment_status": -0.011865,
+    "water_access": -0.000738
+  },
+  "notice": "Describes how this simulated-data model behaves on its held-out simulated test records. Associations, not causes; not validated on real households."
+}

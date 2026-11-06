@@ -1,0 +1,458 @@
+{
+  "model_version": "simulated_rf_v1",
+  "status": "research_candidate",
+  "created_at": "2026-10-20T18:27:45.529659+00:00",
+  "feature_schema": "simulated-household-v1",
+  "features": [
+    "monthly_income",
+    "income_per_capita",
+    "household_size",
+    "num_dependents",
+    "children_under_5",
+    "elderly_members",
+    "distance_to_market_km",
+    "has_disabled_member",
+    "has_chronic_illness",
+    "land_ownership",
+    "employment_status",
+    "water_access"
+  ],
+  "target": "Original simulated risk_label: high=1; low or medium=0. Not an observed food-security outcome.",
+  "artifact_sha256": "beac42441cfdea718743d23e7458deba620c9abf0e72a03332fe0f7948f74085",
+  "data_lineage": {
+    "dataset_type": "simulated",
+    "source": "Original user-supplied foodrisk_project (1)(1).zip",
+    "file": "ml_engine/data/nc-food-insecurity-training.csv",
+    "sha256": "69ca747f2c58e90fb3c1939b58136b80da64c4ba43e8cb22994afc3b8967d888",
+    "rows": 10000,
+    "raw_missing_values": 0,
+    "label_counts": {
+      "high": 4726,
+      "low": 3732,
+      "medium": 1542
+    },
+    "notice": "Original CSV bytes restored unchanged. Generated labels and complete data; not real NGO records. No artificial missingness added."
+  },
+  "code_sha256": {
+    "train_simulated.py": "f72ebf346f0de7e970922dbc319f78adf19cd9e0caf19de7ae27eb9d3b3fc1a2",
+    "simulated_features.py": "45e0c4dd7a2161a4308baabfc98d521c0967a9cf5ccd200c27d4808740b66abf",
+    "train_model.py": "45917a797ee4cc7099d8ab721866b5ef2c1b31a40169e401d43a3ea28d13923b",
+    "monitoring.py": "d32ee9c30acab39ae1c315f5009385e50377356840169960f16de795463efcb1"
+  },
+  "requirements_sha256": "e9cff2fc55374b8c5109f7d01f6402d2912303284a58dd0e1f9e665098f1b834",
+  "environment": {
+    "python": "3.12.14",
+    "sklearn": "1.8.0"
+  },
+  "algorithm": "RandomForestClassifier",
+  "parameters": {
+    "bootstrap": true,
+    "ccp_alpha": 0.0,
+    "class_weight": "balanced",
+    "criterion": "gini",
+    "max_depth": 12,
+    "max_features": "sqrt",
+    "max_leaf_nodes": null,
+    "max_samples": null,
+    "min_impurity_decrease": 0.0,
+    "min_samples_leaf": 3,
+    "min_samples_split": 2,
+    "min_weight_fraction_leaf": 0.0,
+    "monotonic_cst": null,
+    "n_estimators": 100,
+    "n_jobs": 1,
+    "oob_score": false,
+    "random_state": 42,
+    "verbose": 0,
+    "warm_start": false
+  },
+  "selection": "Predeclared Random Forest architecture; fixed binary threshold 0.5; no test-set selection or tuning.",
+  "split": {
+    "train": {
+      "rows": 6000,
+      "positives": 2836
+    },
+    "validation": {
+      "rows": 2000,
+      "positives": 945
+    },
+    "test": {
+      "rows": 2000,
+      "positives": 945
+    }
+  },
+  "split_policy": "Stratified 60/20/20 row split; test seed42, validation seed43. Fit preprocessing on train only. No real-world generalisation claim.",
+  "decision_threshold": 0.5,
+  "comparisons": {
+    "dummy": {
+      "validation": {
+        "n": 2000,
+        "positive_n": 945,
+        "threshold": 0.5,
+        "f1": 0.0,
+        "precision": 0.0,
+        "recall": 0.0,
+        "roc_auc": 0.5,
+        "average_precision": 0.4725,
+        "brier": 0.24924377777777773,
+        "confusion_matrix_tn_fp_fn_tp": [
+          1055,
+          0,
+          945,
+          0
+        ]
+      },
+      "test": {
+        "n": 2000,
+        "positive_n": 945,
+        "threshold": 0.5,
+        "f1": 0.0,
+        "precision": 0.0,
+        "recall": 0.0,
+        "roc_auc": 0.5,
+        "average_precision": 0.4725,
+        "brier": 0.24924377777777773,
+        "confusion_matrix_tn_fp_fn_tp": [
+          1055,
+          0,
+          945,
+          0
+        ]
+      }
+    },
+    "logistic_regression": {
+      "validation": {
+        "n": 2000,
+        "positive_n": 945,
+        "threshold": 0.5,
+        "f1": 0.9428274428274428,
+        "precision": 0.9264555669050051,
+        "recall": 0.9597883597883597,
+        "roc_auc": 0.9878592743047719,
+        "average_precision": 0.9859151767101495,
+        "brier": 0.04191680374770718,
+        "confusion_matrix_tn_fp_fn_tp": [
+          983,
+          72,
+          38,
+          907
+        ]
+      },
+      "test": {
+        "n": 2000,
+        "positive_n": 945,
+        "threshold": 0.5,
+        "f1": 0.936656282450675,
+        "precision": 0.9194699286442406,
+        "recall": 0.9544973544973545,
+        "roc_auc": 0.9881461420797913,
+        "average_precision": 0.9862322157969783,
+        "brier": 0.04235243340492771,
+        "confusion_matrix_tn_fp_fn_tp": [
+          976,
+          79,
+          43,
+          902
+        ]
+      }
+    },
+    "random_forest": {
+      "validation": {
+        "n": 2000,
+        "positive_n": 945,
+        "threshold": 0.5,
+        "f1": 0.9477496120020693,
+        "precision": 0.9271255060728745,
+        "recall": 0.9693121693121693,
+        "roc_auc": 0.988971639208606,
+        "average_precision": 0.9865956195989123,
+        "brier": 0.03867815255580066,
+        "confusion_matrix_tn_fp_fn_tp": [
+          983,
+          72,
+          29,
+          916
+        ]
+      },
+      "test": {
+        "n": 2000,
+        "positive_n": 945,
+        "threshold": 0.5,
+        "f1": 0.9414182939362795,
+        "precision": 0.9150849150849151,
+        "recall": 0.9693121693121693,
+        "roc_auc": 0.9873096115750145,
+        "average_precision": 0.9842065542993834,
+        "brier": 0.041194519425878096,
+        "confusion_matrix_tn_fp_fn_tp": [
+          970,
+          85,
+          29,
+          916
+        ]
+      }
+    }
+  },
+  "high_display_band_test": {
+    "n": 2000,
+    "positive_n": 945,
+    "threshold": 0.66005,
+    "f1": 0.9411764705882353,
+    "precision": 0.9426751592356688,
+    "recall": 0.9396825396825397,
+    "roc_auc": 0.9873096115750145,
+    "average_precision": 0.9842065542993834,
+    "brier": 0.041194519425878096,
+    "confusion_matrix_tn_fp_fn_tp": [
+      1001,
+      54,
+      57,
+      888
+    ]
+  },
+  "display_bands": "Rounded score <=33 Low, <=66 Medium, otherwise High; display bands are not the evaluation threshold.",
+  "validation": {
+    "rubric_targets": {
+      "f1": 0.85,
+      "precision": 0.8,
+      "recall": 0.85,
+      "roc_auc": 0.9
+    },
+    "rubric_targets_met": true,
+    "ngo_external_validation": false,
+    "limitations": "Simulated labels only; measured scores do not validate real household risk. No real-data, NGO, future-outcome or probability-calibration validation. The lecturer's real-data requirement remains unmet."
+  },
+  "drift_reference": {
+    "monthly_income": {
+      "kind": "numeric",
+      "cuts": [
+        132.0,
+        231.0,
+        329.0,
+        473.0,
+        786.0,
+        2542.2000000000003,
+        4110.800000000001,
+        7698.799999999999,
+        10041.2
+      ],
+      "proportions": [
+        0.0995,
+        0.1,
+        0.10016666666666667,
+        0.10016666666666667,
+        0.09983333333333333,
+        0.10033333333333333,
+        0.1,
+        0.1,
+        0.1,
+        0.1
+      ],
+      "min": 0.0,
+      "max": 16150.0,
+      "missing": 0.0
+    },
+    "income_per_capita": {
+      "kind": "numeric",
+      "cuts": [
+        30.39333333333333,
+        54.0,
+        80.46000000000011,
+        123.22999999999999,
+        245.08333333333331,
+        560.2800000000001,
+        1087.55,
+        1714.479999999999,
+        2612.0333333333333
+      ],
+      "proportions": [
+        0.1,
+        0.09916666666666667,
+        0.10083333333333333,
+        0.1,
+        0.1,
+        0.1,
+        0.1,
+        0.1,
+        0.1,
+        0.1
+      ],
+      "min": 0.0,
+      "max": 8075.0,
+      "missing": 0.0
+    },
+    "household_size": {
+      "kind": "numeric",
+      "cuts": [
+        2.0,
+        3.0,
+        4.0,
+        5.0,
+        6.0,
+        7.0
+      ],
+      "proportions": [
+        0.0,
+        0.16116666666666668,
+        0.1685,
+        0.2245,
+        0.203,
+        0.1395,
+        0.10333333333333333
+      ],
+      "min": 2.0,
+      "max": 10.0,
+      "missing": 0.0
+    },
+    "num_dependents": {
+      "kind": "numeric",
+      "cuts": [
+        0.0,
+        1.0,
+        2.0,
+        3.0
+      ],
+      "proportions": [
+        0.0,
+        0.471,
+        0.1425,
+        0.14583333333333334,
+        0.24066666666666667
+      ],
+      "min": 0.0,
+      "max": 6.0,
+      "missing": 0.0
+    },
+    "children_under_5": {
+      "kind": "numeric",
+      "cuts": [
+        0.0,
+        1.0,
+        2.0,
+        3.0
+      ],
+      "proportions": [
+        0.0,
+        0.6256666666666667,
+        0.1225,
+        0.121,
+        0.13083333333333333
+      ],
+      "min": 0.0,
+      "max": 3.0,
+      "missing": 0.0
+    },
+    "elderly_members": {
+      "kind": "numeric",
+      "cuts": [
+        0.0,
+        1.0,
+        2.0
+      ],
+      "proportions": [
+        0.0,
+        0.7543333333333333,
+        0.08116666666666666,
+        0.1645
+      ],
+      "min": 0.0,
+      "max": 3.0,
+      "missing": 0.0
+    },
+    "distance_to_market_km": {
+      "kind": "numeric",
+      "cuts": [
+        4.0,
+        7.0,
+        9.0,
+        11.0,
+        15.0,
+        21.0,
+        28.0,
+        34.0,
+        42.0
+      ],
+      "proportions": [
+        0.08366666666666667,
+        0.10816666666666666,
+        0.09416666666666666,
+        0.09066666666666667,
+        0.1215,
+        0.09266666666666666,
+        0.10216666666666667,
+        0.09166666666666666,
+        0.10583333333333333,
+        0.1095
+      ],
+      "min": 1.0,
+      "max": 81.0,
+      "missing": 0.0
+    },
+    "has_disabled_member": {
+      "kind": "numeric",
+      "cuts": [
+        0.0,
+        1.0
+      ],
+      "proportions": [
+        0.0,
+        0.8535,
+        0.1465
+      ],
+      "min": 0.0,
+      "max": 1.0,
+      "missing": 0.0
+    },
+    "has_chronic_illness": {
+      "kind": "numeric",
+      "cuts": [
+        0.0,
+        1.0
+      ],
+      "proportions": [
+        0.0,
+        0.7948333333333333,
+        0.20516666666666666
+      ],
+      "min": 0.0,
+      "max": 1.0,
+      "missing": 0.0
+    },
+    "land_ownership": {
+      "kind": "numeric",
+      "cuts": [
+        0.0,
+        1.0
+      ],
+      "proportions": [
+        0.0,
+        0.8023333333333333,
+        0.19766666666666666
+      ],
+      "min": 0.0,
+      "max": 1.0,
+      "missing": 0.0
+    },
+    "employment_status": {
+      "kind": "categorical",
+      "proportions": {
+        "unemployed": 0.37833333333333335,
+        "employed": 0.30216666666666664,
+        "informal": 0.18033333333333335,
+        "grant_only": 0.13916666666666666
+      },
+      "missing": 0.0
+    },
+    "water_access": {
+      "kind": "categorical",
+      "proportions": {
+        "piped": 0.4676666666666667,
+        "communal": 0.2235,
+        "borehole": 0.16,
+        "river": 0.07666666666666666,
+        "none": 0.07216666666666667
+      },
+      "missing": 0.0
+    }
+  }
+}

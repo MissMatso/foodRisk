@@ -1,0 +1,20 @@
+{
+  "timestamp_utc": "2026-10-15T03:37:23.032793+00:00",
+  "model_version": "ghs2024_rf_v3",
+  "method": "Django HTTP test client with isolated temporary SQLite database; no browser rendering check",
+  "checks": {
+    "web_score_saved": true,
+    "optional_explanation_button": true,
+    "seven_feature_explanation_saved": true,
+    "cached_explanation_reused": true,
+    "unknown_income_edit": true,
+    "public_pages_200": true,
+    "anonymous_dashboard_redirect": true
+  },
+  "public_routes": {
+    "/": 200,
+    "/how-it-works/": 200,
+    "/model/": 200,
+    "/accounts/login/": 200
+  }
+}

@@ -1,0 +1,52 @@
+@startuml
+!pragma layout smetana
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName DejaVu Sans
+skinparam defaultFontSize 16
+skinparam ArrowColor #087C61
+skinparam ClassBorderColor #087C61
+skinparam ClassBackgroundColor #EAF7ED
+skinparam ActorBorderColor #192D3D
+skinparam UsecaseBackgroundColor #EAF7ED
+skinparam UsecaseBorderColor #087C61
+skinparam ActivityBackgroundColor #EAF7ED
+skinparam ActivityBorderColor #087C61
+skinparam ParticipantBackgroundColor #EAF7ED
+skinparam ParticipantBorderColor #087C61
+skinparam NoteBackgroundColor #FFF6DF
+skinparam NoteBorderColor #C5AB62
+skinparam roundcorner 8
+skinparam dpi 160
+actor "Staff / admin" as User
+participant "Web view / API action" as View
+participant "get_predictor()" as Factory
+participant "RiskPredictor" as ML
+database "Database" as DB
+User -> View : POST household prediction
+View -> View : authenticate; check role
+View -> DB : retrieve household (404 if absent)
+DB --> View : Household
+View -> Factory : get_predictor()
+alt artifact load fails
+ Factory --> View : UnavailablePredictor
+ View -> View : predict() returns error
+else cached or loaded
+ Factory --> View : RiskPredictor
+ View -> ML : predict(household)
+ ML -> ML : build features; pipeline.predict_proba()
+ ML -> ML : categorise; elapsed-time check
+ ML --> View : result or error
+end
+alt error result
+ View --> User : Web redirect + message / API 422
+else successful result
+ View -> DB : save_prediction(): INSERT score, version,\nencrypted input snapshot, artifact hash, actor
+ DB --> View : saved result
+ View --> User : Web redirect + message / API 201
+end
+note over User,View
+ Denied requests stop before household lookup or inference.
+ Web access: redirect or 403; session API: 403.
+end note
+@enduml

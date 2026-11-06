@@ -1,0 +1,9 @@
+{% extends "admin/base.html" %}
+{% load static %}
+{% block title %}{{ title }} | FoodRisk administration{% endblock %}
+{% block extrastyle %}{{ block.super }}
+<link rel="stylesheet" href="{% static 'vendor/fonts.css' %}">
+<link rel="stylesheet" href="{% static 'css/admin-theme.css' %}">
+{% endblock %}
+{% block branding %}<div id="site-name"><a href="{% url 'home' %}">Food<span>Risk</span></a> <small>Administration</small></div>{% endblock %}
+{% block nav-global %}<a class="workspace-return" href="{{ workspace_url }}">Return to workspace</a>{% endblock %}

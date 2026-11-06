@@ -1,0 +1,73 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign in — FoodRisk</title>
+    <link rel="stylesheet" href="{% static 'vendor/fonts.css' %}">
+    <link href="{% static 'vendor/bootstrap.min.css' %}" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="stylesheet" href="{% static 'css/theme.css' %}">
+    <link rel="icon" href="{% static 'img/bowl-low.svg' %}" type="image/svg+xml">
+</head>
+<body>
+<a class="skip-link" href="#sign-in">Skip to sign in</a>
+<div class="login-shell">
+  <div class="row g-0 w-100">
+    <div class="col-lg-6 login-hero">
+      <a class="login-mark" href="{% url 'home' %}" aria-label="FoodRisk home">Food<span>Risk</span></a>
+      <img src="{% static 'img/foodrisk-community.webp' %}" alt="Community workers sharing fresh produce" class="login-community">
+      <h1>Every household deserves to be seen.</h1>
+      <p>Keep household records together, review indicative food insecurity scores,
+         and plan support with more context.</p>
+      <a class="login-hero-link" href="{% url 'how_it_works' %}">See how FoodRisk works <span aria-hidden="true">↗</span></a>
+    </div>
+    <main class="col-lg-6 login-form-side" id="sign-in">
+      <div class="login-form-card">
+        {% if messages %}
+          {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}" role="alert">{{ message }}</div>
+          {% endfor %}
+        {% endif %}
+        <p class="login-eyebrow">TEAM ACCESS</p>
+        {% if signed_in_as %}
+        <h2 class="mb-1">You are already signed in.</h2>
+        <div class="alert alert-info" role="status" id="already-signed-in">
+          This browser is signed in as <strong>{{ signed_in_as.username }}</strong> ({{ signed_in_as.get_role_display }}).
+          All tabs in a browser share one sign-in. To use another account, sign out first, or open a private window
+          (Ctrl + Shift + N).
+        </div>
+        <div class="d-flex gap-2">
+          <a class="btn btn-primary" href="{{ workspace }}">Continue as {{ signed_in_as.username }}</a>
+          <form method="post" action="{% url 'accounts:logout' %}">{% csrf_token %}<button type="submit" class="btn btn-outline-secondary">Sign out</button></form>
+        </div>
+        {% else %}
+        <h2 class="mb-1">Welcome back.</h2>
+        <p class="text-muted mb-4">Use the account your organisation gave you.</p>
+        <form method="post">
+          {% csrf_token %}
+          {% if next %}<input type="hidden" name="next" value="{{ next }}">{% endif %}
+          {% if form.non_field_errors %}<div class="alert alert-danger" role="alert">{{ form.non_field_errors }}</div>{% endif %}
+          <div class="mb-3 login-field">
+            <label class="form-label" for="{{ form.username.id_for_label }}">Username</label>
+            {{ form.username }}
+            {% for error in form.username.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
+          </div>
+          <div class="mb-4 login-field">
+            <label class="form-label" for="{{ form.password.id_for_label }}">Password</label>
+            {{ form.password }}
+            {% for error in form.password.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
+          </div>
+          <button type="submit" class="btn btn-primary w-100 login-submit">Sign in <span aria-hidden="true">↗</span></button>
+        </form>
+        {% endif %}
+        <p class="login-help">Need an account? Ask your system administrator.</p>
+        <div class="login-meta"><a href="{% url 'home' %}">← Back to home</a><a href="{% url 'model_guide' %}">About the model</a></div>
+      </div>
+    </main>
+  </div>
+</div>
+<script src="{% static 'vendor/bootstrap.bundle.min.js' %}"></script>
+</body>
+</html>

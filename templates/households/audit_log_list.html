@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block title %}Audit Log{% endblock %}
+{% block content %}
+{% include "partials/log_tabs.html" with active_log="households" %}
+<p class="text-muted">Every household create, edit and delete, newest first.</p>
+
+<form method="get" class="card p-3 mb-3">
+  {{ filter_form.non_field_errors }}
+  <div class="row g-2 align-items-end">
+    <div class="col-md-2"><label class="form-label mb-1" for="{{ filter_form.action.id_for_label }}">Action</label>{{ filter_form.action }}</div>
+    <div class="col-md-2"><label class="form-label mb-1" for="{{ filter_form.user.id_for_label }}">Changed by</label>{{ filter_form.user }}</div>
+    <div class="col-md-3"><label class="form-label mb-1" for="{{ filter_form.household.id_for_label }}">Household</label>{{ filter_form.household }}</div>
+    <div class="col-md-2"><label class="form-label mb-1" for="{{ filter_form.date_from.id_for_label }}">From</label>{{ filter_form.date_from }}{{ filter_form.date_from.errors }}</div>
+    <div class="col-md-2"><label class="form-label mb-1" for="{{ filter_form.date_to.id_for_label }}">To (inclusive)</label>{{ filter_form.date_to }}{{ filter_form.date_to.errors }}</div>
+    <div class="col-md-1"><button type="submit" class="btn btn-success w-100">Filter</button></div>
+  </div>
+  <div class="mt-2 small"><a href="{% url 'households:audit_log' %}">Clear filters</a>{% if not filter_form.errors %} · <a href="{% url 'households:audit_log_csv' %}{% if filter_query %}?{{ filter_query }}{% endif %}">Download these entries (CSV)</a>{% endif %}</div>
+</form>
+
+<div class="table-responsive">
+<table class="table table-striped bg-white">
+  <thead><tr><th>When</th><th>Household</th><th>Action</th><th>Changed by</th><th>Fields changed</th></tr></thead>
+  <tbody>
+    {% for log in logs %}
+    <tr>
+      <td>{{ log.timestamp|date:"d M Y H:i" }}</td>
+      <td>
+        {% if log.household %}
+        <a href="{% url 'households:household_detail' log.household.pk %}">{{ log.household_name }}</a>
+        {% else %}
+        {{ log.household_name }} <span class="text-muted small">(deleted)</span>
+        {% endif %}
+      </td>
+      <td>
+        {% if log.action == 'create' %}<span class="badge bg-success">Created</span>
+        {% elif log.action == 'update' %}<span class="badge bg-warning text-dark">Updated</span>
+        {% else %}<span class="badge bg-danger">Deleted</span>{% endif %}
+      </td>
+      <td>{% if log.changed_by %}{{ log.changed_by.username }}{% else %}<span class="text-muted">system</span>{% endif %}</td>
+      <td class="small">{{ log.changes.fields_changed|join:", " }}</td>
+    </tr>
+    {% empty %}
+    <tr><td colspan="5" class="text-center text-muted">No audit log entries match these filters.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+</div>
+{% include "partials/pagination.html" %}
+{% endblock %}

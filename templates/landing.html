@@ -1,0 +1,119 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="FoodRisk helps Northern Cape NGO teams register households, assess food insecurity risk, and prioritise support.">
+  <title>FoodRisk | See where support is needed</title>
+  <link rel="stylesheet" href="{% static 'vendor/fonts.css' %}">
+  <link rel="stylesheet" href="{% static 'css/landing.css' %}">
+  <link rel="icon" href="{% static 'img/bowl-low.svg' %}" type="image/svg+xml">
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header">
+    <div class="wrap header-inner">
+      <a class="brand" href="{% url 'home' %}" aria-label="FoodRisk home">
+        <img src="{% static 'img/bowl-low.svg' %}" alt="" width="36" height="36">
+        <span>Food<span class="brand-accent">Risk</span></span>
+      </a>
+      <nav class="main-nav" aria-label="Main navigation">
+        <a href="{% url 'how_it_works' %}">How it works</a>
+        <a href="#platform">The platform</a>
+        <a href="{% url 'model_guide' %}">About the model</a>
+      </nav>
+      {% if user.is_authenticated %}
+        <a class="button button-dark header-action" href="{{ workspace_url }}">{% if is_system_admin %}Open system report{% else %}Open dashboard{% endif %} <span aria-hidden="true">↗</span></a>
+      {% else %}
+        <a class="button button-dark header-action" href="{% url 'accounts:login' %}">Sign in <span aria-hidden="true">↗</span></a>
+      {% endif %}
+    </div>
+  </header>
+
+  <main id="main">
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="wrap hero-grid">
+        <div class="hero-copy">
+          <p class="eyebrow"><span class="eyebrow-line"></span> Food security starts with visibility</p>
+          <h1 id="hero-title">See where <em>support</em> is needed first.</h1>
+          <p class="hero-lede">A shared tool for Northern Cape NGO teams to register households, assess food insecurity risk, and make more informed decisions about support.</p>
+          <div class="hero-actions">
+            <a class="button button-green" href="#platform">Explore the platform <span aria-hidden="true">↓</span></a>
+          </div>
+          <div class="hero-note"><span class="note-dot"></span> Built for NGO staff working with households in the Northern Cape</div>
+        </div>
+        <div class="hero-art">
+          <img src="{% static 'img/foodrisk-community.webp' %}" alt="Illustration of two community workers sharing a basket of fresh produce in a Northern Cape garden" width="1774" height="887">
+          <div class="art-caption"><span class="caption-mark" aria-hidden="true">✳</span> Better information helps teams respond sooner.</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="purpose-band" aria-label="Our purpose">
+      <div class="wrap purpose-inner">
+        <span class="purpose-label">OUR PURPOSE</span>
+        <p>Every household has a story. <strong>FoodRisk helps teams see the needs behind the numbers.</strong></p>
+        <span class="purpose-sprout" aria-hidden="true">✳</span>
+      </div>
+    </section>
+
+    <section class="section steps-section" id="how-it-works" aria-labelledby="steps-title">
+      <div class="wrap">
+        <div class="section-intro">
+          <p class="eyebrow">FROM INFORMATION TO ACTION</p>
+          <h2 id="steps-title">A clearer view of every household.</h2>
+          <p>Keep the information teams need in one place, then use an indicative risk assessment to guide follow-up.</p>
+        </div>
+        <div class="steps">
+          <article class="step">
+            <div class="step-top"><span class="step-number">01</span><span class="step-icon" aria-hidden="true">⌂</span></div>
+            <h3>Register households</h3>
+            <p>Record household composition, circumstances, and access to essentials in a shared system.</p>
+          </article>
+          <article class="step">
+            <div class="step-top"><span class="step-number">02</span><span class="step-icon" aria-hidden="true">◔</span></div>
+            <h3>Assess food insecurity</h3>
+            <p>Generate a risk score and category to help identify households that may need attention.</p>
+          </article>
+          <article class="step">
+            <div class="step-top"><span class="step-number">03</span><span class="step-icon" aria-hidden="true">↗</span></div>
+            <h3>Prioritise support</h3>
+            <p>Review the dashboard and household history to plan follow-up with more context.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section platform-section" id="platform" aria-labelledby="platform-title">
+      <div class="wrap platform-grid">
+        <div class="platform-copy">
+          <p class="eyebrow">INSIDE THE PLATFORM</p>
+          <h2 id="platform-title">An overview your team can act on.</h2>
+          <p>The dashboard brings household risk categories into view, with filters to help staff focus on the records they need.</p>
+          <ul class="feature-list">
+            <li><span aria-hidden="true">✓</span> Household records in one place</li>
+            <li><span aria-hidden="true">✓</span> Risk categories and assessment history</li>
+            <li><span aria-hidden="true">✓</span> Filters for focused review</li>
+          </ul>
+          <p class="preview-caveat">The preview uses fictitious households. The current model uses simulated training data for demonstration and still needs staff judgement.</p>
+        </div>
+        <figure class="preview-frame">
+          <div class="preview-toolbar"><span></span><span></span><span></span><span class="preview-title">FoodRisk dashboard</span></div>
+          <img src="{% static 'img/foodrisk-dashboard-preview.png' %}" alt="Preview of the FoodRisk dashboard showing households sorted by their risk category and available filters" width="1280" height="800" loading="lazy">
+          <figcaption>Preview of the dashboard with sample household data</figcaption>
+        </figure>
+      </div>
+    </section>
+
+  </main>
+  <footer class="site-footer">
+    <div class="wrap footer-inner">
+      <span class="brand footer-brand">Food<span class="brand-accent">Risk</span></span>
+      <span>Supporting informed food security decisions in the Northern Cape.</span>
+      <a href="{% url 'model_guide' %}">Model and limitations</a>
+      <a href="#main">Back to top ↑</a>
+    </div>
+  </footer>
+</body>
+</html>

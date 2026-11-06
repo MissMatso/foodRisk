@@ -1,0 +1,53 @@
+@startuml
+!pragma layout smetana
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName DejaVu Sans
+skinparam defaultFontSize 16
+skinparam ArrowColor #087C61
+skinparam ClassBorderColor #087C61
+skinparam ClassBackgroundColor #EAF7ED
+skinparam ActorBorderColor #192D3D
+skinparam UsecaseBackgroundColor #EAF7ED
+skinparam UsecaseBorderColor #087C61
+skinparam ActivityBackgroundColor #EAF7ED
+skinparam ActivityBorderColor #087C61
+skinparam ParticipantBackgroundColor #EAF7ED
+skinparam ParticipantBorderColor #087C61
+skinparam NoteBackgroundColor #FFF6DF
+skinparam NoteBorderColor #C5AB62
+skinparam roundcorner 8
+skinparam dpi 160
+actor "Staff / admin" as User
+participant "Web view / API" as View
+participant "explain_prediction()" as Service
+participant "Versioned RiskPredictor" as ML
+database "Database" as DB
+User -> View : POST explanation request
+View -> View : authenticate; role and CSRF checks
+View -> DB : retrieve saved prediction
+DB --> View : score, version, snapshot, cached explanation
+View -> Service : explain_prediction(prediction)
+alt explanation already saved
+ Service --> View : cached values
+else original snapshot absent
+ Service --> View : unavailable; keep score
+else snapshot present
+ Service -> ML : verify original version, schema, hash
+ Service -> ML : explain(original snapshot)
+ ML -> ML : lazy TreeSHAP; group contributions
+ ML --> Service : contributions or failure
+ alt explanation succeeded
+  Service -> DB : save if still NULL; set generation time
+  DB --> Service : persisted explanation
+ else failed
+  Service -> Service : keep existing score unchanged
+ end
+ Service --> View : explanation or error
+end
+View --> User : detail page or API result
+note over Service,ML
+ Household edits do not change this snapshot.
+ No background queue; explanation request is synchronous.
+end note
+@enduml

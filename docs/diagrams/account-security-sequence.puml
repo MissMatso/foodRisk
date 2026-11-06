@@ -1,0 +1,58 @@
+@startuml
+!pragma layout smetana
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName DejaVu Sans
+skinparam defaultFontSize 16
+skinparam ArrowColor #087C61
+skinparam ClassBorderColor #087C61
+skinparam ClassBackgroundColor #EAF7ED
+skinparam ActorBorderColor #192D3D
+skinparam UsecaseBackgroundColor #EAF7ED
+skinparam UsecaseBorderColor #087C61
+skinparam ActivityBackgroundColor #EAF7ED
+skinparam ActivityBorderColor #087C61
+skinparam ParticipantBackgroundColor #EAF7ED
+skinparam ParticipantBorderColor #087C61
+skinparam NoteBackgroundColor #FFF6DF
+skinparam NoteBorderColor #C5AB62
+skinparam roundcorner 8
+skinparam dpi 160
+actor "Any user" as User
+actor "Administrator" as Admin
+participant "Django auth" as Auth
+participant "accounts.signals" as Sig
+participant "Users page:\nUserRoleView /\nUserStatusView" as View
+participant "events.record_event" as Rec
+database "AccountEvent" as DB
+== Sign-in ==
+User -> Auth : POST /accounts/login/
+alt Valid and active account
+ Auth -> Sig : user_logged_in
+ Sig -> Rec : login (account, address)
+else Wrong password, unknown name or deactivated
+ Auth -> Sig : user_login_failed
+ alt Typed name matches an account
+  Sig -> Rec : failed login (account name, address)
+ else No matching account
+  Sig -> Rec : failed login (blank name, "Unknown username")
+ end
+end
+Rec -> DB : Insert event (password never stored)
+== Account change on the Users page ==
+Admin -> View : POST role or active, plus next
+View -> View : Admin check, not own account,\nonly a superuser edits a superuser,\nrole must be a valid choice
+alt Rejected
+ View --> Admin : Error message, no change
+else Accepted
+ View -> DB : Save role or is_active
+ View -> Rec : role changed / activated / deactivated
+ Rec -> DB : Insert event (actor, account, detail)
+ View --> Admin : Back to the Users page (same-site next only)
+end
+note over Sig, DB
+Five or more failed logins for one account in 24 hours raise a warning
+on the system report. It is a prompt to review, not proof of an attack.
+There is no automatic lockout.
+end note
+@enduml

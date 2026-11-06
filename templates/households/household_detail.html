@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}{{ household.name }}{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h1>{{ household.name }}</h1>
+  <div class="d-flex gap-2">
+  {% if user.role == 'staff' or user.role == 'admin' or user.is_superuser %}
+  <a href="{% url 'households:household_update' household.pk %}" class="btn btn-outline-secondary btn-sm">Edit</a>
+  {% endif %}
+  {% if is_system_admin %}
+  <a href="{% url 'households:household_delete' household.pk %}" class="btn btn-outline-danger btn-sm">Delete household</a>
+  {% endif %}
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-6">
+    <div class="card p-3 mb-3">
+      <h6 class="text-muted">Household Details</h6>
+      {% if show_personal_details %}
+      <p><strong>Address:</strong> {{ household.address }}{% if household.shared_address_reason %}<br><span class="small text-muted">Shares this address with another registered household: {{ household.shared_address_reason }}</span>{% endif %}</p>
+      <p><strong>Contact:</strong> {{ household.contact }}</p>
+      {% else %}
+      <p class="text-muted small mb-1"><strong>Address and contact:</strong> not shown to analysts.</p>
+      {% endif %}
+      {% if household.ward or household.village %}
+      <p><strong>Ward / Village:</strong> {{ household.ward|default:"—" }} / {{ household.village|default:"—" }}</p>
+      {% endif %}
+      <p><strong>Province:</strong> {{ household.get_province_display }}</p>
+      <p><strong>Monthly Income:</strong> {% if household.monthly_income != None %}R{{ household.monthly_income }}{% else %}Unknown{% endif %}</p>
+      <p><strong>Household Size:</strong> {{ household.household_size }}</p>
+      <p><strong>Dependents:</strong> {{ household.num_dependents }}</p>
+      <p><strong>Employment Status:</strong> {{ household.get_employment_status_display }}</p>
+      <hr>
+      <p><strong>Children under 5:</strong> {{ household.children_under_5 }}</p>
+      <p><strong>Members aged 60+:</strong> {{ household.elderly_members }}</p>
+      <p><strong>Disabled member in household:</strong> {% if household.has_disabled_member %}Yes{% else %}No{% endif %}</p>
+      <p><strong>Chronic illness in household:</strong> {% if household.has_chronic_illness %}Yes{% else %}No{% endif %}</p>
+      <p><strong>Distance to market:</strong> {{ household.distance_to_market_km }} km</p>
+      <p><strong>Water access:</strong> {{ household.get_water_access_display }}</p>
+      <p><strong>Owns land:</strong> {% if household.land_ownership %}Yes{% else %}No{% endif %}</p>
+      <p class="text-muted small mb-0">Registered {{ household.created_at|date:"d M Y H:i" }}
+        {% if household.registered_by %}by {{ household.registered_by.username }}{% endif %}</p>
+    </div>
+  </div>
+  <div class="col-md-6">
+    {% if audit_logs and user.role == 'admin' or user.is_superuser %}
+    <div class="card p-3 mb-3">
+      <h6 class="text-muted">Recent Changes</h6>
+      <ul class="list-group list-group-flush">
+        {% for log in audit_logs %}
+        <li class="list-group-item small">
+          <strong>{{ log.get_action_display }}</strong> by {% if log.changed_by %}{{ log.changed_by.username }}{% else %}system{% endif %}
+          — {{ log.timestamp|date:"d M Y H:i" }}
+        </li>
+        {% endfor %}
+      </ul>
+      <a href="{% url 'households:audit_log' %}" class="btn btn-sm btn-outline-secondary mt-2">Full Audit Log</a>
+    </div>
+    {% endif %}
+    <div class="card p-3 mb-3">
+      <h6 class="text-muted mb-3">Risk Prediction</h6>
+      {% if user.role == 'staff' or user.role == 'admin' or user.is_superuser %}
+      <form method="post" action="{% url 'predictions:generate' household.pk %}" onsubmit="this.querySelector('button[type=submit]').disabled = true;">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-primary mb-3">Generate Risk Score</button>
+      </form>
+      {% endif %}
+      {% with latest=household.latest_prediction %}
+      {% if latest %}
+        {% if latest_out_of_date %}
+        <div class="alert alert-warning py-2" role="alert"><strong>Out of date.</strong> This household's details have changed since the score below was calculated.{% if show_personal_details %} Generate a new score.{% endif %}</div>
+        {% endif %}
+        <div class="risk-score-block mb-2">
+          {% if latest.category == 'Low' %}<img src="{% static 'img/bowl-low.svg' %}" alt="">
+          {% elif latest.category == 'Medium' %}<img src="{% static 'img/bowl-medium.svg' %}" alt="">
+          {% else %}<img src="{% static 'img/bowl-high.svg' %}" alt="">{% endif %}
+          <div>
+            <div class="risk-score-number risk-{{ latest.category|lower }}">{{ latest.score }}%</div>
+            <div class="risk-score-label">{{ latest.category }} indicative model category</div>
+          </div>
+        </div>
+        {% if latest.income_was_estimated %}<p class="small text-warning-emphasis">Based on an estimated income (none recorded).</p>{% endif %}
+        <p><a class="btn btn-outline-success btn-sm" href="{% url 'predictions:detail' latest.pk %}">Review score and record action</a></p>
+        <p class="text-muted small">Model: {{ latest.model_version }} · {{ latest.created_at|date:"d M Y H:i" }}</p>
+        <p class="text-muted small"><a href="{% url 'model_guide' %}">Understand this score and its limitations</a></p>
+      {% else %}
+        <p class="text-muted">No prediction generated yet.</p>
+      {% endif %}
+      {% endwith %}
+      <a href="{% url 'predictions:history' household.pk %}" class="btn btn-sm btn-outline-primary">View Full History</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

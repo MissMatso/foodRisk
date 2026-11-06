@@ -1,0 +1,37 @@
+@startuml
+!pragma layout smetana
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName DejaVu Sans
+skinparam defaultFontSize 16
+skinparam ArrowColor #087C61
+skinparam ClassBorderColor #087C61
+skinparam ClassBackgroundColor #EAF7ED
+skinparam ActorBorderColor #192D3D
+skinparam UsecaseBackgroundColor #EAF7ED
+skinparam UsecaseBorderColor #087C61
+skinparam ActivityBackgroundColor #EAF7ED
+skinparam ActivityBorderColor #087C61
+skinparam ParticipantBackgroundColor #EAF7ED
+skinparam ParticipantBorderColor #087C61
+skinparam NoteBackgroundColor #FFF6DF
+skinparam NoteBorderColor #C5AB62
+skinparam roundcorner 8
+skinparam dpi 160
+top to bottom direction
+actor "NGO staff" as Staff
+actor "Data analyst" as Analyst
+actor "System admin" as Admin
+rectangle "FoodRisk application\nDjango pages and session API" as App
+database "Household, prediction,\nuser and audit data" as DB
+artifact "Saved model pipeline\nregistry/version/model.joblib" as Model
+Staff --> App : record and assess
+Analyst --> App : review and export
+Admin --> App : manage users / system report\nand other role functions
+App --> DB : Django ORM
+App --> Model : local inference
+note bottom of App
+No external prediction service.
+Aid allocation is outside the application.
+end note
+@enduml

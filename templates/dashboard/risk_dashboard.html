@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% block title %}Risk Dashboard{% endblock %}
+{% block content %}
+<h1 class="mb-1">Risk Dashboard</h1>
+<p class="text-muted mb-3" style="font-size:0.92rem;">Highest risk first. Click a column heading to sort by it; click again to reverse.</p>
+<p class="demo-notice">Showing the latest assessment per household for model {{ model_version }}. Scores reflect the selected model’s training labels; the active release uses simulated data and is not a validated forecast. <a href="{% url 'model_guide' %}">How to interpret them</a>.</p>
+<div class="woven-rule" style="max-width:120px;"></div>
+
+<form method="get" class="row g-2 mb-3">
+  <input type="hidden" name="sort" value="{{ sort }}">
+  <div class="col-md-2">
+    <select aria-label="Risk category" name="category" class="form-select">
+      <option value="">All Categories</option>
+      {% for value, label in category_choices %}
+      <option value="{{ value }}" {% if value == selected_category %}selected{% endif %}>{{ label }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="col-md-2">
+    <select aria-label="Ward" name="ward" class="form-select">
+      <option value="">All wards</option>
+      {% for ward in wards %}<option value="{{ ward }}"{% if ward == selected_ward %} selected{% endif %}>{{ ward }}</option>{% endfor %}
+    </select>
+  </div>
+  <div class="col-md-2">
+    <select aria-label="Employment status" name="employment_status" class="form-select">
+      <option value="">All Employment Statuses</option>
+      {% for value, label in employment_choices %}
+      <option value="{{ value }}" {% if value == selected_employment %}selected{% endif %}>{{ label }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="col-md-2">
+    <input type="date" aria-label="Predicted on or after" name="date_from" class="form-control" value="{{ date_from }}">
+  </div>
+  <div class="col-md-2">
+    <input type="date" aria-label="Predicted on or before" name="date_to" class="form-control" value="{{ date_to }}">
+  </div>
+  <div class="col-md-2 d-flex gap-1">
+    <button type="submit" class="btn btn-primary w-100">Filter</button>
+    <a href="{% url 'dashboard:risk_dashboard' %}" class="btn btn-outline-secondary" title="Clear filters and sorting">Reset</a>
+  </div>
+</form>
+
+<div class="table-responsive">
+<table class="table table-striped bg-white">
+  <thead><tr>
+    {% for column in columns %}
+    {% if column.key %}
+    <th scope="col"{% if column.direction %} aria-sort="{{ column.direction }}"{% endif %}><a class="text-reset text-decoration-none" href="{% querystring sort=column.next page=None %}" title="Sort by {{ column.label|lower }}">{{ column.label }} <span aria-hidden="true">{% if column.direction == "ascending" %}▲{% elif column.direction == "descending" %}▼{% else %}↕{% endif %}</span></a></th>
+    {% else %}<th scope="col">{{ column.label }}</th>{% endif %}
+    {% endfor %}
+  </tr></thead>
+  <tbody>
+    {% for h in households %}
+    <tr>
+      <td>{{ h.name }}</td>
+      <td>{{ h.ward|default:"—" }}</td>
+      <td>{{ h.get_employment_status_display }}</td>
+      <td>{{ h.household_size }}</td>
+      <td>{% if h.latest_score != None %}{{ h.latest_score }}%{% else %}—{% endif %}{% if h.out_of_date %} <span class="badge text-bg-warning" title="This household's details changed after the score was calculated">Out of date</span>{% endif %}</td>
+      <td>{% include "partials/risk_pill.html" with category=h.latest_category %}</td>
+      <td>{% if h.latest_date %}{{ h.latest_date|date:"d M Y" }}{% else %}—{% endif %}</td>
+      <td><a href="{% url 'households:household_detail' h.pk %}" class="btn btn-sm btn-outline-primary">View</a></td>
+    </tr>
+    {% empty %}
+    <tr><td colspan="8" class="text-center text-muted">No households match the current filters.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+</div>
+{% include "partials/pagination.html" %}
+{% endblock %}

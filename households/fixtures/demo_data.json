@@ -1,0 +1,384 @@
+[
+{
+  "model": "accounts.customuser",
+  "pk": 1,
+  "fields": {
+    "password": "pbkdf2_sha256$1500000$TaoO2pcLmcC9IwLoR8FW4n$Pjdw++DBR1EhL+WHktDS702f/JOtMjQtDlf2HMfRRFI=",
+    "last_login": null,
+    "is_superuser": true,
+    "username": "admin_demo",
+    "first_name": "",
+    "last_name": "",
+    "email": "",
+    "is_staff": true,
+    "is_active": true,
+    "date_joined": "2026-09-23T09:23:52.164Z",
+    "role": "admin",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "accounts.customuser",
+  "pk": 2,
+  "fields": {
+    "password": "pbkdf2_sha256$1500000$e8vg9awpjSrdgR5u32OGXB$WkqYr6+xXDa4XXYEBZ91Yzp93eC87ZbncF378zFW+AU=",
+    "last_login": null,
+    "is_superuser": false,
+    "username": "staff_demo",
+    "first_name": "",
+    "last_name": "",
+    "email": "",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2026-09-23T09:23:52.614Z",
+    "role": "staff",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "accounts.customuser",
+  "pk": 3,
+  "fields": {
+    "password": "pbkdf2_sha256$1500000$VFM6E4xHBvzRUPTdKlIsaf$MU9P+NPw0cr1ghy+fMAdxxs4huLZKpoQpwnqq33l2lc=",
+    "last_login": null,
+    "is_superuser": false,
+    "username": "analyst_demo",
+    "first_name": "",
+    "last_name": "",
+    "email": "",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2026-09-23T09:23:53.072Z",
+    "role": "analyst",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "households.household",
+  "pk": 1,
+  "fields": {
+    "name": "Dlamini Household",
+    "address": "12 Church St, Galeshewe, Kimberley",
+    "contact": "0731234567",
+    "ward": "ZF Mgcawu",
+    "village": "Galeshewe",
+    "monthly_income": "1800.00",
+    "household_size": 6,
+    "num_dependents": 4,
+    "employment_status": "unemployed",
+    "has_disabled_member": false,
+    "has_chronic_illness": true,
+    "children_under_5": 2,
+    "elderly_members": 1,
+    "distance_to_market_km": 35,
+    "water_access": "communal",
+    "land_ownership": false,
+    "registered_by": 2,
+    "created_at": "2026-09-23T09:23:53.566Z",
+    "updated_at": "2026-09-23T09:23:53.566Z"
+  }
+},
+{
+  "model": "households.household",
+  "pk": 2,
+  "fields": {
+    "name": "Mokoena Household",
+    "address": "45 Long St, Roodepan, Kimberley",
+    "contact": "0739876543",
+    "ward": "Pixley ka Seme",
+    "village": "Roodepan",
+    "monthly_income": "6200.00",
+    "household_size": 3,
+    "num_dependents": 1,
+    "employment_status": "employed",
+    "has_disabled_member": false,
+    "has_chronic_illness": false,
+    "children_under_5": 1,
+    "elderly_members": 0,
+    "distance_to_market_km": 4,
+    "water_access": "piped",
+    "land_ownership": true,
+    "registered_by": 2,
+    "created_at": "2026-09-23T09:23:53.591Z",
+    "updated_at": "2026-09-23T09:23:53.591Z"
+  }
+},
+{
+  "model": "households.household",
+  "pk": 3,
+  "fields": {
+    "name": "Van Wyk Household",
+    "address": "7 Jan Smuts Rd, Kimberley",
+    "contact": "0745551122",
+    "ward": "Namaqua",
+    "village": "Kimberley",
+    "monthly_income": "3200.00",
+    "household_size": 5,
+    "num_dependents": 3,
+    "employment_status": "informal",
+    "has_disabled_member": true,
+    "has_chronic_illness": false,
+    "children_under_5": 1,
+    "elderly_members": 1,
+    "distance_to_market_km": 18,
+    "water_access": "borehole",
+    "land_ownership": false,
+    "registered_by": 2,
+    "created_at": "2026-09-23T09:23:53.612Z",
+    "updated_at": "2026-09-23T09:23:53.612Z"
+  }
+},
+{
+  "model": "households.household",
+  "pk": 4,
+  "fields": {
+    "name": "Seleke Household",
+    "address": "89 Barkly Rd, Kimberley",
+    "contact": "0721239988",
+    "ward": "Hantam",
+    "village": "Calvinia",
+    "monthly_income": "2400.00",
+    "household_size": 4,
+    "num_dependents": 2,
+    "employment_status": "grant_only",
+    "has_disabled_member": false,
+    "has_chronic_illness": true,
+    "children_under_5": 2,
+    "elderly_members": 0,
+    "distance_to_market_km": 22,
+    "water_access": "river",
+    "land_ownership": false,
+    "registered_by": 2,
+    "created_at": "2026-09-23T09:23:53.634Z",
+    "updated_at": "2026-09-23T09:23:53.634Z"
+  }
+},
+{
+  "model": "households.household",
+  "pk": 5,
+  "fields": {
+    "name": "Botha Household",
+    "address": "3 Du Toitspan Rd, Kimberley",
+    "contact": "0827773344",
+    "ward": "John Taolo Gaetsewe",
+    "village": "Hotazel",
+    "monthly_income": "4500.00",
+    "household_size": 2,
+    "num_dependents": 0,
+    "employment_status": "employed",
+    "has_disabled_member": false,
+    "has_chronic_illness": false,
+    "children_under_5": 0,
+    "elderly_members": 1,
+    "distance_to_market_km": 6,
+    "water_access": "piped",
+    "land_ownership": true,
+    "registered_by": 2,
+    "created_at": "2026-09-23T09:23:53.654Z",
+    "updated_at": "2026-09-23T09:23:53.655Z"
+  }
+},
+{
+  "model": "households.auditlog",
+  "pk": 1,
+  "fields": {
+    "household": 1,
+    "household_name": "Dlamini Household",
+    "action": "create",
+    "changed_by": null,
+    "changes": {
+      "created": true
+    },
+    "timestamp": "2026-09-23T09:23:53.567Z"
+  }
+},
+{
+  "model": "households.auditlog",
+  "pk": 2,
+  "fields": {
+    "household": 2,
+    "household_name": "Mokoena Household",
+    "action": "create",
+    "changed_by": null,
+    "changes": {
+      "created": true
+    },
+    "timestamp": "2026-09-23T09:23:53.592Z"
+  }
+},
+{
+  "model": "households.auditlog",
+  "pk": 3,
+  "fields": {
+    "household": 3,
+    "household_name": "Van Wyk Household",
+    "action": "create",
+    "changed_by": null,
+    "changes": {
+      "created": true
+    },
+    "timestamp": "2026-09-23T09:23:53.613Z"
+  }
+},
+{
+  "model": "households.auditlog",
+  "pk": 4,
+  "fields": {
+    "household": 4,
+    "household_name": "Seleke Household",
+    "action": "create",
+    "changed_by": null,
+    "changes": {
+      "created": true
+    },
+    "timestamp": "2026-09-23T09:23:53.634Z"
+  }
+},
+{
+  "model": "households.auditlog",
+  "pk": 5,
+  "fields": {
+    "household": 5,
+    "household_name": "Botha Household",
+    "action": "create",
+    "changed_by": null,
+    "changes": {
+      "created": true
+    },
+    "timestamp": "2026-09-23T09:23:53.655Z"
+  }
+},
+{
+  "model": "predictions.prediction",
+  "pk": 1,
+  "fields": {
+    "household": 1,
+    "score": 96.99,
+    "category": "High",
+    "model_version": "random_forest_v1",
+    "explanation": {
+      "monthly_income": 0.10007459356563737,
+      "income_per_capita": 0.19529405800669167,
+      "household_size": 0.008042019173608774,
+      "num_dependents": 0.006211746518040986,
+      "children_under_5": 0.009658213263757726,
+      "elderly_members": -2.2675981110269587e-05,
+      "distance_to_market_km": 0.015499048030293878,
+      "has_disabled_member": -0.0024637845463010223,
+      "has_chronic_illness": 0.01690857313232891,
+      "land_ownership": 0.0020917012701742806,
+      "employment_status": 0.11032285911853006,
+      "water_access": 0.008357043065726927
+    },
+    "generated_by": 2,
+    "created_at": "2026-09-23T09:23:53.588Z"
+  }
+},
+{
+  "model": "predictions.prediction",
+  "pk": 2,
+  "fields": {
+    "household": 2,
+    "score": 0.0,
+    "category": "Low",
+    "model_version": "random_forest_v1",
+    "explanation": {
+      "monthly_income": -0.1303689999940016,
+      "income_per_capita": -0.1731105306566752,
+      "household_size": -0.005211521855221151,
+      "num_dependents": 0.001035907539670597,
+      "children_under_5": 0.007012243731158737,
+      "elderly_members": -0.0003040894817018929,
+      "distance_to_market_km": -0.009816457176366904,
+      "has_disabled_member": -0.0036184450125448537,
+      "has_chronic_illness": -0.005059496978546444,
+      "land_ownership": -0.004719138439348179,
+      "employment_status": -0.16458521393123016,
+      "water_access": -0.01121383946786481
+    },
+    "generated_by": 2,
+    "created_at": "2026-09-23T09:23:53.610Z"
+  }
+},
+{
+  "model": "predictions.prediction",
+  "pk": 3,
+  "fields": {
+    "household": 3,
+    "score": 42.35,
+    "category": "Medium",
+    "model_version": "random_forest_v1",
+    "explanation": {
+      "monthly_income": -0.08250743023624159,
+      "income_per_capita": -0.19104373775914704,
+      "household_size": 0.007098725081441336,
+      "num_dependents": 9.368172649099235e-05,
+      "children_under_5": -0.002341730191269488,
+      "elderly_members": 0.00122410442213442,
+      "distance_to_market_km": 0.002209492646904129,
+      "has_disabled_member": 0.08578424191633373,
+      "has_chronic_illness": -0.01016617005433915,
+      "land_ownership": 0.006649581211853349,
+      "employment_status": 0.05793172466200292,
+      "water_access": 0.048587046983145823
+    },
+    "generated_by": 2,
+    "created_at": "2026-09-23T09:23:53.631Z"
+  }
+},
+{
+  "model": "predictions.prediction",
+  "pk": 4,
+  "fields": {
+    "household": 4,
+    "score": 93.16,
+    "category": "High",
+    "model_version": "random_forest_v1",
+    "explanation": {
+      "monthly_income": 0.0748812522699224,
+      "income_per_capita": 0.17942032591154314,
+      "household_size": 0.0003111129428359663,
+      "num_dependents": 0.0070884755436805115,
+      "children_under_5": 0.009532341718348752,
+      "elderly_members": -0.0003678476170592718,
+      "distance_to_market_km": 0.013415561457270304,
+      "has_disabled_member": -0.0033792004001937936,
+      "has_chronic_illness": 0.018729640367488982,
+      "land_ownership": 0.005708550331285928,
+      "employment_status": 0.10058608060010088,
+      "water_access": 0.02575823790815803
+    },
+    "generated_by": 2,
+    "created_at": "2026-09-23T09:23:53.652Z"
+  }
+},
+{
+  "model": "predictions.prediction",
+  "pk": 5,
+  "fields": {
+    "household": 5,
+    "score": 0.0,
+    "category": "Low",
+    "model_version": "random_forest_v1",
+    "explanation": {
+      "monthly_income": -0.12050427731288459,
+      "income_per_capita": -0.1729303067509894,
+      "household_size": -0.007159088427009663,
+      "num_dependents": 0.0009204361837961126,
+      "children_under_5": -0.005187096398138964,
+      "elderly_members": 0.000340393028695852,
+      "distance_to_market_km": -0.009749004509971144,
+      "has_disabled_member": -0.0045598424180251056,
+      "has_chronic_illness": -0.005385703027425643,
+      "land_ownership": -0.005509108349208917,
+      "employment_status": -0.15824517190700957,
+      "water_access": -0.011990811834501403
+    },
+    "generated_by": 2,
+    "created_at": "2026-09-23T09:23:53.672Z"
+  }
+}
+]

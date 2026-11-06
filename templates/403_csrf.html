@@ -1,0 +1,14 @@
+{% extends "public_base.html" %}
+{% block title %}Page expired | FoodRisk{% endblock %}
+{% block content %}
+<section class="section inner-section"><div class="wrap" style="max-width:640px">
+  <p class="eyebrow">PAGE EXPIRED</p>
+  <h1>This page expired before it was sent.</h1>
+  <p>Nothing was saved. Forms carry a security code that changes when someone signs in or out. This usually happens when you sign in or out in another tab of the same browser while this page was open.</p>
+  <ol>
+    <li>Go back and reload the page (F5), then try again.</li>
+    <li>To use two accounts at once, open the second one in a private window (Ctrl + Shift + N).</li>
+  </ol>
+  <p><a class="button button-green" href="{{ sign_in }}">Go to sign in</a></p>
+</div></section>
+{% endblock %}

@@ -1,0 +1,22 @@
+@startuml
+!pragma layout smetana
+skinparam backgroundColor white
+skinparam defaultFontSize 16
+skinparam dpi 160
+skinparam shadowing false
+start
+:Review saved prediction;
+:Choose record or update intervention;
+if (Staff or administrator?) then (yes)
+:Enter action, notes, follow-up date and status;
+if (Form valid?) then (yes)
+:Create linked record or update existing record;
+:Return to prediction detail;
+else (no)
+:Show field errors without saving;
+endif
+else (no)
+:Login redirect or access denied;
+endif
+stop
+@enduml

@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}Prediction History — {{ household.name }}{% endblock %}
+{% block content %}
+<h1>Prediction History — {{ household.name }}</h1>
+<a href="{% url 'households:household_detail' household.pk %}" class="btn btn-sm btn-outline-secondary mb-3">&larr; Back to household</a>
+<div class="table-responsive">
+<table class="table table-striped bg-white">
+  <thead><tr><th>Date</th><th>Score</th><th>Category</th><th>Model Version</th><th></th></tr></thead>
+  <tbody>
+    {% for p in predictions %}
+    <tr>
+      <td>{{ p.created_at|date:"d M Y H:i" }}</td>
+      <td>{{ p.score }}%</td>
+      <td>{% include "partials/risk_pill.html" with category=p.category %}</td>
+      <td>{{ p.model_version }}</td>
+      <td><a href="{% url 'predictions:detail' p.pk %}" class="btn btn-sm btn-outline-primary">Details</a></td>
+    </tr>
+    {% empty %}
+    <tr><td colspan="5" class="text-center text-muted">No predictions recorded yet.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+</div>
+{% endblock %}

@@ -1,0 +1,251 @@
+/* ==========================================================================
+   FoodRisk AI — "Harvest Ledger" visual identity
+
+   Concept: this tool exists to decide who gets fed. The single most
+   important thing on any screen is a household's risk tier, so risk is
+   shown as a bowl of grain — full (Low), half (Medium), cracked and
+   empty (High) — rather than a generic coloured dot. That's the one bold
+   move; everything else (type, layout, tables) stays quiet and legible,
+   since staff are scanning dense lists fast.
+
+   Palette is a cool sage-stone ground with a deep civic blue-teal and a
+   muted grain-gold accent — deliberately not the cream+terracotta or
+   dark+neon defaults.
+   ========================================================================== */
+
+:root {
+  --ink: #16233a;
+  --ink-soft: #3b4a5e;
+  --muted: #667085;
+
+  --surface: #eef1ec;
+  --surface-card: #fdfcfa;
+  --border: #dcdbd0;
+
+  --primary: #23415a;
+  --primary-dark: #16283a;
+  --primary-tint: #e4ebef;
+
+  --accent: #b8862e;
+  --accent-tint: #f2e6cc;
+
+  --risk-low: #4c7a5e;
+  --risk-low-tint: #e3ece5;
+  --risk-medium: #b8862e;
+  --risk-medium-tint: #f2e6cc;
+  --risk-high: #a23b3b;
+  --risk-high-tint: #f2dfdd;
+
+  --radius: 4px;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  background-color: var(--surface);
+  color: var(--ink);
+  font-family: "Public Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: 15px;
+  line-height: 1.55;
+}
+
+h1, h2, h3, h4, .display-heading {
+  font-family: "Fraunces", Georgia, serif;
+  font-weight: 560;
+  color: var(--ink);
+  letter-spacing: -0.01em;
+}
+
+a { color: var(--primary); }
+a:hover { color: var(--accent); }
+
+/* --- Woven divider -------------------------------------------------------
+   A restrained nod to Karoo basket-weave patterns, used once per page as
+   a section break — never as decoration on every card. */
+
+.woven-rule {
+  height: 6px;
+  background-image: repeating-linear-gradient(
+    115deg, var(--accent) 0 6px, transparent 6px 12px
+  );
+  opacity: 0.55;
+  border-radius: 3px;
+  margin: 0.25rem 0 1.5rem;
+}
+
+/* --- Navbar ------------------------------------------------------------ */
+
+.fr-navbar { background: var(--primary-dark); border-bottom: 1px solid rgba(255, 255, 255, 0.08); }
+.fr-navbar .navbar-brand {
+  font-family: "Fraunces", Georgia, serif;
+  font-style: italic;
+  font-weight: 600;
+  font-size: 1.35rem;
+  color: #fdfcfa !important;
+  letter-spacing: -0.01em;
+}
+.fr-navbar .nav-link { color: rgba(253, 252, 250, 0.78) !important; font-weight: 500; font-size: 0.92rem; }
+.fr-navbar .nav-link:hover, .fr-navbar .nav-link.active { color: #fdfcfa !important; }
+.fr-navbar .navbar-text { color: rgba(253, 252, 250, 0.6); font-size: 0.88rem; }
+
+.fr-role-pill {
+  display: inline-block;
+  padding: 0.15rem 0.55rem;
+  border-radius: 999px;
+  background: rgba(184, 134, 46, 0.22);
+  color: #f0d9ac;
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+/* --- Buttons ------------------------------------------------------------ */
+
+.btn { border-radius: var(--radius); font-weight: 600; font-size: 0.92rem; }
+.btn-primary { background: var(--primary); border-color: var(--primary); }
+.btn-primary:hover, .btn-primary:focus { background: var(--primary-dark); border-color: var(--primary-dark); }
+.btn-accent { background: var(--accent); border-color: var(--accent); color: #fff; }
+.btn-accent:hover { background: #9c7126; border-color: #9c7126; color: #fff; }
+.btn-outline-primary { color: var(--primary); border-color: var(--primary); }
+.btn-outline-primary:hover { background: var(--primary); border-color: var(--primary); }
+.btn-outline-secondary { color: var(--ink-soft); border-color: var(--border); }
+
+/* --- Cards ---------------------------------------------------------------
+   Flat, hairline-bordered, left accent stripe instead of the generic
+   soft-shadow rounded-corner SaaS-kit default. */
+
+.card {
+  background: var(--surface-card);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--primary);
+  border-radius: var(--radius);
+  box-shadow: none;
+}
+.card.card-accent-low { border-left-color: var(--risk-low); }
+.card.card-accent-medium { border-left-color: var(--risk-medium); }
+.card.card-accent-high { border-left-color: var(--risk-high); }
+
+/* --- Risk pills (bowl icon + label) --------------------------------------
+   Colour is never the only signal — the bowl shape itself carries the
+   meaning, so it still reads correctly for colourblind staff. */
+
+.risk-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.2rem 0.65rem 0.2rem 0.35rem;
+  border-radius: 999px;
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+.risk-pill img { width: 16px; height: 16px; display: block; }
+
+.risk-pill-low { background: var(--risk-low-tint); color: var(--risk-low); }
+.risk-pill-medium { background: var(--risk-medium-tint); color: var(--risk-medium); }
+.risk-pill-high { background: var(--risk-high-tint); color: var(--risk-high); }
+.risk-pill-none { background: #eceae2; color: var(--muted); }
+.risk-pill-none::before {
+  content: "";
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--muted); display: inline-block;
+}
+
+/* Legacy .risk-badge-* selectors kept so any older markup still renders. */
+.risk-badge-low { background-color: var(--risk-low) !important; }
+.risk-badge-medium { background-color: var(--risk-medium) !important; color: #fff !important; }
+.risk-badge-high { background-color: var(--risk-high) !important; }
+
+/* --- Big risk-score panel (household detail) ------------------------------
+   The score is the single most important number in the app, paired with
+   the bowl illustration at a size that earns the attention. */
+
+.risk-score-block { display: flex; align-items: center; gap: 1.1rem; }
+.risk-score-block img { width: 56px; height: 56px; flex: none; }
+.risk-score-number {
+  font-family: "Fraunces", Georgia, serif;
+  font-weight: 600;
+  font-size: 3rem;
+  line-height: 1;
+}
+.risk-score-number.risk-low { color: var(--risk-low); }
+.risk-score-number.risk-medium { color: var(--risk-medium); }
+.risk-score-number.risk-high { color: var(--risk-high); }
+.risk-score-label { color: var(--muted); font-size: 0.9rem; margin-top: 0.15rem; }
+
+/* --- Tables --------------------------------------------------------------- */
+
+.table { --bs-table-bg: transparent; font-size: 0.92rem; }
+.table thead th {
+  border-bottom: 2px solid var(--border);
+  color: var(--ink-soft);
+  font-weight: 600;
+  font-size: 0.85rem;
+}
+.table-striped > tbody > tr:nth-of-type(odd) > * { background-color: rgba(35, 65, 90, 0.035); }
+.table > :not(caption) > * > * { border-bottom-color: var(--border); }
+
+/* --- Forms ------------------------------------------------------------ */
+
+.form-control, .form-select { border-color: var(--border); border-radius: var(--radius); }
+.form-control:focus, .form-select:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 0.15rem var(--primary-tint);
+}
+.form-label { font-weight: 600; font-size: 0.88rem; color: var(--ink-soft); }
+
+/* --- Alerts -------------------------------------------------------------- */
+
+.alert { border-radius: var(--radius); border: 1px solid transparent; }
+.demo-notice { padding: 0.75rem 1rem; border-left: 3px solid #087c61; background: #eaf7ed; color: #29443a; font-size: 0.87rem; }
+.demo-notice a { font-weight: 700; }
+
+/* --- Login hero ----------------------------------------------------------
+   The single characteristic moment: the bowl motif, large, with the
+   mission stated plainly rather than a generic "welcome back" card. */
+
+.login-shell { min-height: 100vh; display: flex; }
+.login-hero {
+  background: var(--primary-dark);
+  color: #fdfcfa;
+  padding: 3.5rem 3rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+.login-hero .login-mark {
+  font-family: "Fraunces", Georgia, serif;
+  font-style: italic;
+  font-size: 1.1rem;
+  color: #f0d9ac;
+  margin-bottom: 2rem;
+  text-decoration: none;
+}
+.login-mark span { color: #a4e8bd; }
+.login-hero .hero-bowl { width: 84px; height: 84px; margin-bottom: 1.75rem; }
+.login-hero h1 {
+  font-family: "Fraunces", Georgia, serif;
+  font-style: italic;
+  font-weight: 560;
+  font-size: 2.15rem;
+  color: #fdfcfa;
+  max-width: 19ch;
+  line-height: 1.2;
+}
+.login-hero p { color: rgba(253, 252, 250, 0.72); max-width: 38ch; font-size: 0.98rem; margin-top: 0.85rem; }
+.login-hero-link { color: #a4e8bd; font-weight: 700; text-decoration-thickness: 1px; text-underline-offset: 5px; margin-top: 1.3rem; }
+.login-hero-link:hover { color: white; }
+.login-form-side { background: var(--surface); display: flex; align-items: center; justify-content: center; padding: 2rem; }
+.login-form-card { width: 100%; max-width: 420px; }
+.login-eyebrow { color: #087c61; font-weight: 700; letter-spacing: 0.14em; font-size: 0.75rem; margin-bottom: 1rem; }
+.login-form-card h2 { font-size: clamp(2rem, 3vw, 2.7rem); }
+.login-field .form-control { min-height: 50px; padding-inline: 0.9rem; background: #fff; }
+.login-submit { min-height: 52px; display: flex; justify-content: space-between; align-items: center; padding-inline: 1.1rem; }
+.login-help { color: var(--muted); font-size: 0.86rem; margin: 1.3rem 0 2rem; }
+.login-meta { display: flex; gap: 1rem; justify-content: space-between; border-top: 1px solid var(--border); padding-top: 1.2rem; font-size: 0.86rem; font-weight: 600; }
+.skip-link { position: absolute; z-index: 20; top: -100px; left: 1rem; padding: 0.75rem 1rem; background: #fff; }
+.skip-link:focus { top: 1rem; }
+
+@media (max-width: 767px) {
+  .login-hero { padding: 2.5rem 1.5rem; }
+}

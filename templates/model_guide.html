@@ -1,0 +1,37 @@
+{% extends "public_base.html" %}
+{% block title %}Model and limitations | FoodRisk{% endblock %}
+{% block description %}How FoodRisk produces an indicative risk score and what its demonstration model cannot establish.{% endblock %}
+{% block content %}
+<section class="inner-hero model-hero" aria-labelledby="page-title"><div class="wrap model-hero-copy">
+  <p class="eyebrow">MODEL TRANSPARENCY</p>
+  <h1 id="page-title">A signal for review, not a decision on its own.</h1>
+  <p class="hero-lede">FoodRisk uses a Random Forest trained on the original 10,000-row simulated household dataset. Its results help a team organise follow-up; they have not been validated against real NGO outcomes.</p>
+</div></section>
+
+<section class="section inner-section" aria-labelledby="score-title"><div class="wrap split-content">
+  <div><p class="eyebrow">READING THE RESULT</p><h2 id="score-title">What the score means.</h2><p>The model estimates patterns associated with the simulated High risk label, compared with the simulated Low and Medium labels. The percentage is grouped into the display bands below. It is not a measured probability that this household will experience food insecurity.</p></div>
+  <div class="score-bands" aria-label="FoodRisk display categories">
+    <div><span class="band-marker band-low">Low</span><strong>0–33</strong><span>Lower model score</span></div>
+    <div><span class="band-marker band-medium">Medium</span><strong>Over 33–66</strong><span>Review with context</span></div>
+    <div><span class="band-marker band-high">High</span><strong>Over 66–100</strong><span>Prompt follow-up review</span></div>
+  </div>
+</div></section>
+
+<section class="section inner-section" aria-labelledby="shap-title"><div class="wrap split-content">
+  <div><p class="eyebrow">READING AN EXPLANATION</p><h2 id="shap-title">What the SHAP values mean.</h2>
+  <p>Every explanation starts from the model's <strong>baseline</strong>: its average score over the simulated training data (about 50%). Each feature then pushes this household's score up or down from that baseline. The pushes are SHAP values, given in percentage points, and the baseline plus all of them adds up exactly to the household's score.</p>
+  <p>The analyst report also shows the <strong>average size</strong> of each feature's push (mean |SHAP|) across the model's 2,000 held-out test records. That tells you which features the model relies on most overall. In the current model, income per person, monthly income and employment status matter most. Ward, village and province are not inputs, so two households with the same circumstances get the same score wherever they live.</p></div>
+  <div class="info-card"><span class="info-index">EXAMPLE</span><h3>Baseline 50% → score 72%</h3><p>Income per person +15 pts, employment status +9 pts, water access +2 pts, children under 5 −1 pt, other features −3 pts. 50 + 15 + 9 + 2 − 1 − 3 = 72. The values show what the model learned from simulated data. They are associations, not causes.</p></div>
+</div></section>
+<section class="section quiet-section" aria-labelledby="limits-title"><div class="wrap">
+  <p class="eyebrow">CURRENT LIMITS</p><h2 id="limits-title">What the model cannot prove yet.</h2>
+  <div class="info-grid">
+    <article class="info-card"><span class="info-index">01 / DATA</span><h3>Simulated demonstration data</h3><p>The original CSV contains 10,000 generated records with complete fields and simulated labels. It is restored unchanged. Evaluation on this data cannot establish accuracy for real households or fulfil a real-data training requirement.</p></article>
+    <article class="info-card"><span class="info-index">02 / CATEGORIES</span><h3>Indicative bands</h3><p>The classifier learns High versus Low-or-Medium from simulated labels. The displayed Medium category is a score band, not a separately trained class.</p></article>
+    <article class="info-card"><span class="info-index">03 / OVERSIGHT</span><h3>People stay involved</h3><p>Staff should check the household record, speak with the household as appropriate, and use organisational criteria before deciding on support.</p></article>
+  </div>
+  <p class="method-footnote">The assessment history records the model version; staff can request and retain feature contributions separately so a reviewer can inspect what influenced a result. External NGO validation and a privacy review are needed before operational use.</p>
+</div></section>
+
+<section class="closing"><div class="wrap closing-inner"><div><p class="eyebrow">WORK WITH CONTEXT</p><h2>Explore the complete workflow.</h2><p>See how household records, assessments, and review fit together.</p></div><a class="button button-light" href="{% url 'how_it_works' %}">How it works <span aria-hidden="true">↗</span></a></div></section>
+{% endblock %}

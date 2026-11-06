@@ -1,0 +1,11 @@
+@startuml
+!pragma layout smetana
+skinparam backgroundColor white
+skinparam defaultFontSize 16
+skinparam dpi 160
+skinparam shadowing false
+[*] --> Open : create open
+[*] --> Completed : create completed
+Open --> Completed : staff updates status
+Completed --> Open : staff reopens
+@enduml

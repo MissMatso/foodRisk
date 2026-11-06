@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}Delete {{ household.name }}{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-8 col-lg-6">
+    <h1 class="h3 mb-3">Delete {{ household.name }}?</h1>
+    <div class="card p-3 mb-3">
+      <p class="mb-2">This permanently removes:</p>
+      <ul class="mb-2">
+        <li>the household record ({{ household.ward|default:"no ward" }}, {{ household.village|default:"no village" }})</li>
+        <li>{{ prediction_count }} risk assessment{{ prediction_count|pluralize }} and their explanations</li>
+        <li>{{ intervention_count }} recorded intervention{{ intervention_count|pluralize }}</li>
+      </ul>
+      <p class="small text-muted mb-0">Use this only when the record must be erased, for example a person asks for their data to be removed or the household was registered by mistake. The audit log keeps an entry saying who deleted the household and when, but no details about it. This cannot be undone.</p>
+    </div>
+    <form method="post" class="d-flex gap-2">
+      {% csrf_token %}
+      <button type="submit" class="btn btn-danger">Delete household and its history</button>
+      <a class="btn btn-outline-secondary" href="{% url 'households:household_detail' household.pk %}">Cancel</a>
+    </form>
+  </div>
+</div>
+{% endblock %}

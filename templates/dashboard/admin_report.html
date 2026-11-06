@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block title %}System administration report | FoodRisk{% endblock %}
+{% block content %}
+<div class="d-flex flex-wrap justify-content-between align-items-start gap-3 mb-4">
+  <div><p class="app-eyebrow">ADMINISTRATOR REPORT</p><h1>System administration</h1><p class="text-muted">Accounts, recorded activity and follow-up oversight.</p></div>
+  {% if report %}<div class="d-flex gap-2 no-print">
+    <button type="button" class="btn btn-outline-success" onclick="window.print()">Print report</button>
+    <a class="btn btn-success" href="{% url 'dashboard:admin_export_pdf' %}?date_from={{ report.date_from|date:'Y-m-d' }}&amp;date_to={{ report.date_to|date:'Y-m-d' }}">Download PDF</a>
+    <a class="btn btn-outline-success" href="{% url 'dashboard:admin_export_csv' %}?date_from={{ report.date_from|date:'Y-m-d' }}&amp;date_to={{ report.date_to|date:'Y-m-d' }}">Export CSV</a>
+  </div>{% endif %}
+</div>
+<form method="get" class="card p-3 mb-4 no-print">
+  {{ period_form.non_field_errors }}
+  <div class="row g-3 align-items-end">
+    <div class="col-md-4"><label class="form-label" for="id_date_from">Activity from</label>{{ period_form.date_from }}{{ period_form.date_from.errors }}</div>
+    <div class="col-md-4"><label class="form-label" for="id_date_to">Activity to (inclusive)</label>{{ period_form.date_to }}{{ period_form.date_to.errors }}</div>
+    <div class="col-md-4"><button class="btn btn-success" type="submit">Apply dates</button> <a class="btn btn-link" href="{% url 'dashboard:admin_report' %}">Reset</a></div>
+  </div>
+</form>
+{% if report %}
+<p class="text-muted">Generated {{ report.generated_at|date:"d M Y, H:i T" }}. Activity period: {{ report.date_from|date:"d M Y" }}–{{ report.date_to|date:"d M Y" }}.</p>
+<div class="row g-3 mb-4">
+  <div class="col-6 col-lg-3"><div class="card p-3 h-100"><span>Total users</span><strong class="display-6">{{ report.total_users }}</strong><small>All current accounts</small></div></div>
+  <div class="col-6 col-lg-3"><div class="card p-3 h-100"><span>Active accounts</span><strong class="display-6">{{ report.active_users }}</strong><small>Enabled to sign in</small></div></div>
+  <div class="col-6 col-lg-3"><div class="card p-3 h-100"><span>Deactivated accounts</span><strong class="display-6">{{ report.inactive_users }}</strong><small>Sign-in disabled</small></div></div>
+  <div class="col-6 col-lg-3"><div class="card p-3 h-100"><span>New registrations</span><strong class="display-6">{{ report.new_users }}</strong><small>Within the selected period</small></div></div>
+</div>
+<div class="row g-4 mb-4">
+ <section class="col-lg-6"><div class="card p-3 h-100"><h2 class="h5">Users by application role</h2><table class="table"><thead><tr><th>Role</th><th>Total</th><th>Active</th><th>Deactivated</th></tr></thead><tbody>{% for row in report.roles %}<tr><th>{{ row.label }}</th><td>{{ row.total }}</td><td>{{ row.active }}</td><td>{{ row.inactive }}</td></tr>{% endfor %}</tbody></table><p class="small mb-0">Django staff flag: {{ report.django_staff_users }} · Superuser flag: {{ report.superusers }} · Still on a temporary password: {{ report.temporary_password_users }}. These flags are separate from application roles.</p></div></section>
+ <section class="col-lg-6"><div class="card p-3 h-100"><h2 class="h5">Account review</h2><dl class="row mb-2"><dt class="col-8">Never logged in</dt><dd class="col-4">{{ report.never_logged_in }}</dd><dt class="col-8">Active with no login in 90 days or ever</dt><dd class="col-4">{{ report.dormant_active_users }}</dd></dl><p class="small">These counts help identify accounts to review; they do not automatically deactivate anyone.</p><a class="no-print" href="{% url 'accounts:user_list' %}">Manage user accounts →</a></div></section>
+</div>
+{% if report.repeated_failures %}<div class="alert alert-warning" role="alert"><strong>Possible password guessing (last 24 hours):</strong> {% for row in report.repeated_failures %}{{ row.username }} ({{ row.total }} failed logins){% if not forloop.last %}, {% endif %}{% endfor %}. Review these accounts below. This is a prompt to check, not proof of an attack.</div>{% endif %}
+<section class="card p-3 mb-4"><h2 class="h5">Sign-in and account changes in the selected period</h2><div class="table-responsive"><table class="table"><thead><tr><th>Successful logins</th><th>Failed logins</th><th>Failed, no matching account</th><th>Role changes</th><th>Deactivated</th><th>Activated</th></tr></thead><tbody><tr><td>{{ report.login_success_count }}</td><td>{{ report.login_failed_count }}</td><td>{{ report.login_failed_unknown_count }}</td><td>{{ report.role_change_count }}</td><td>{{ report.deactivation_count }}</td><td>{{ report.activation_count }}</td></tr></tbody></table></div><p class="small mb-0">From the account event log, which only holds events recorded since it was installed. A failed login for a name that matches no account is counted but its text is not stored. A warning appears when one account has {{ report.failed_login_alert }} or more failed logins in 24 hours.</p></section>
+<section class="card p-3 mb-4"><h2 class="h5">Current system records</h2><div class="table-responsive"><table class="table"><thead><tr><th>Households</th><th>Assessments</th><th>Interventions</th><th>Open</th><th>Completed</th><th>Overdue open follow-ups</th></tr></thead><tbody><tr><td>{{ report.household_count }}</td><td>{{ report.prediction_count }}</td><td>{{ report.intervention_count }}</td><td>{{ report.open_interventions }}</td><td>{{ report.completed_interventions }}</td><td>{{ report.overdue_interventions }}</td></tr></tbody></table></div><p class="small mb-0">Assessments include all model versions. Current configured model: <strong>{{ report.model_version }}</strong>.</p></section>
+<section class="card p-3 mb-4"><h2 class="h5">Activity in the selected period</h2><div class="table-responsive"><table class="table"><thead><tr><th>Households created</th><th>Assessments generated</th><th>Interventions recorded</th><th>Household audit events</th></tr></thead><tbody><tr><td>{{ report.period_households }}</td><td>{{ report.period_predictions }}</td><td>{{ report.period_interventions }}</td><td>{{ report.audit_count }}</td></tr></tbody></table></div><p class="small mb-0">{% for row in report.audit_actions %}{{ row.label }}: {{ row.total }}{% if not forloop.last %} · {% endif %}{% endfor %}</p></section>
+<section class="card p-3 mb-4"><h2 class="h5">Account roster and activity</h2><p class="small">Current account details; the last three columns count retained records created in the selected period.</p><div class="table-responsive"><table class="table table-sm admin-account-table"><thead><tr><th>Username</th><th>Role</th><th>Status</th><th>Joined</th><th>Last login</th><th>Households</th><th>Assessments</th><th>Interventions</th></tr></thead><tbody>{% for account in report.accounts %}<tr><td>{{ account.username }}</td><td>{{ account.role }}</td><td>{% if account.active %}Active{% else %}Deactivated{% endif %}</td><td>{{ account.joined|date:"d M Y H:i" }}</td><td>{{ account.last_login|date:"d M Y H:i"|default:"Never" }}</td><td>{{ account.households }}</td><td>{{ account.predictions }}</td><td>{{ account.interventions }}</td></tr>{% empty %}<tr><td colspan="8">No accounts available.</td></tr>{% endfor %}</tbody></table></div><p class="small mb-0">Period activity without a linked user: {{ report.unattributed_households }} households, {{ report.unattributed_predictions }} assessments and {{ report.unattributed_interventions }} interventions.</p></section>
+<p class="no-print small mb-4">To create, deactivate or reactivate an account, change a role or reset a password, use <a href="{% url 'accounts:user_list' %}">Manage users</a> (the one place where accounts are changed).</p>
+<section class="card p-3 mb-4"><h2 class="h5">Recent sign-in and account events</h2><p class="small">Up to ten latest events in the selected period. Network addresses are shown here only and are not included in downloads.</p><div class="table-responsive"><table class="table table-sm admin-account-table"><thead><tr><th>When</th><th>Event</th><th>Account</th><th>Changed by</th><th>Address</th><th>Detail</th></tr></thead><tbody>{% for event in report.recent_events %}<tr><td>{{ event.timestamp|date:"d M Y H:i" }}</td><td>{{ event.get_event_type_display }}</td><td>{{ event.username|default:"(no matching account)" }}</td><td>{{ event.performed_by.username|default:"" }}</td><td>{{ event.ip_address|default:"" }}</td><td>{{ event.detail }}</td></tr>{% empty %}<tr><td colspan="6">No sign-in or account events in this period.</td></tr>{% endfor %}</tbody></table></div></section>
+<p class="demo-notice">{{ report_note }}</p>
+<p class="no-print"><a href="{% url 'dashboard:risk_reports' %}">Open food-risk analytics</a> · <a href="{% url 'households:audit_log' %}">Review household audit log</a></p>
+{% endif %}
+{% endblock %}
+{% block extra_js %}<style>
+.admin-account-table td {overflow-wrap:anywhere;}
+@media print {
+ @page {size:A4 landscape;margin:12mm;}
+ .no-print,.fr-navbar,.app-footer,.skip-link,.app-main > .app-eyebrow {display:none!important;}
+ body {background:white!important;color:black!important;font-size:10pt;}
+ .app-main {width:100%!important;max-width:none!important;margin:0!important;padding:0!important;}
+ .card {box-shadow:none!important;border:1px solid #ccc!important;}
+ .table-responsive {overflow:visible!important;}
+ thead {display:table-header-group;} tr {break-inside:avoid;}
+ h1,h2 {break-after:avoid;} .admin-account-table {font-size:8pt;}
+ a {color:black!important;text-decoration:none;}
+}
+</style>{% endblock %}

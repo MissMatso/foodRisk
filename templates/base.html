@@ -1,0 +1,71 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Food Insecurity Risk System{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'vendor/fonts.css' %}">
+    <link href="{% static 'vendor/bootstrap.min.css' %}" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="stylesheet" href="{% static 'css/theme.css' %}">
+    <link rel="icon" href="{% static 'img/bowl-low.svg' %}" type="image/svg+xml">
+</head>
+<body>
+<a class="skip-link" href="#main-content">Skip to content</a>
+{% if user.is_authenticated %}
+<nav class="navbar navbar-expand-xl fr-navbar mb-4">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="{% url 'home' %}"><img src="{% static 'img/bowl-low.svg' %}" alt="" width="32" height="32">Food<span>Risk</span></a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu" aria-controls="navMenu" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navMenu">
+      <ul class="navbar-nav me-auto">
+        {% if not is_system_admin %}
+        <li class="nav-item"><a class="nav-link" href="{% url 'dashboard:risk_dashboard' %}">Dashboard</a></li>
+        {% if user.role == 'staff' %}
+        <li class="nav-item"><a class="nav-link" href="{% url 'households:household_list' %}">Households</a></li>
+        {% elif user.role == 'analyst' %}
+        <li class="nav-item"><a class="nav-link" href="{% url 'households:household_list' %}">Households</a></li>
+        {% endif %}
+        {% endif %}
+        {% if user.role == 'analyst' or user.role == 'admin' or user.is_superuser %}
+        <li class="nav-item"><a class="nav-link" href="{% url 'dashboard:reports' %}">{% if user.role == 'admin' or user.is_superuser %}System report{% else %}Risk reports{% endif %}</a></li>
+        {% endif %}
+        {% if user.is_superuser or user.role == 'admin' %}
+        <li class="nav-item"><a class="nav-link" href="{% url 'accounts:user_list' %}">Users</a></li>
+        <li class="nav-item"><a class="nav-link" href="{% url 'households:audit_log' %}">Audit Log</a></li>
+        {% endif %}
+        <li class="nav-item"><a class="nav-link" href="{% url 'how_it_works' %}">How it works</a></li>
+      </ul>
+      <span class="navbar-text me-3">{{ user.username }} <span class="fr-role-pill">{{ user.get_role_display }}</span></span>
+      <a class="btn btn-outline-light btn-sm me-2" href="{% url 'accounts:password_change' %}">Change password</a>
+      <form method="post" action="{% url 'accounts:logout' %}" class="d-flex">
+        {% csrf_token %}
+        <button class="btn btn-outline-light btn-sm" type="submit">Logout</button>
+      </form>
+    </div>
+  </div>
+</nav>
+{% endif %}
+
+<main class="container app-main" id="main-content">
+  <p class="app-eyebrow">FOODRISK WORKSPACE</p>
+  {% if messages %}
+    {% for message in messages %}
+      <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+        {{ message }}
+        <button type="button" class="btn-close" aria-label="Close notification" data-bs-dismiss="alert"></button>
+      </div>
+    {% endfor %}
+  {% endif %}
+
+  {% block content %}{% endblock %}
+</main>
+<footer class="app-footer"><div class="container"><strong>FoodRisk</strong><span>Supporting informed food security decisions.</span><a href="{% url 'model_guide' %}">Model and limitations</a></div></footer>
+
+<script src="{% static 'vendor/bootstrap.bundle.min.js' %}"></script>
+{% block extra_js %}{% endblock %}
+</body>
+</html>

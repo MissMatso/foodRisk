@@ -1,0 +1,50 @@
+@startuml
+!pragma layout smetana
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName DejaVu Sans
+skinparam defaultFontSize 16
+skinparam ArrowColor #087C61
+skinparam ClassBorderColor #087C61
+skinparam ClassBackgroundColor #EAF7ED
+skinparam ActorBorderColor #192D3D
+skinparam UsecaseBackgroundColor #EAF7ED
+skinparam UsecaseBorderColor #087C61
+skinparam ActivityBackgroundColor #EAF7ED
+skinparam ActivityBorderColor #087C61
+skinparam ParticipantBackgroundColor #EAF7ED
+skinparam ParticipantBorderColor #087C61
+skinparam NoteBackgroundColor #FFF6DF
+skinparam NoteBorderColor #C5AB62
+skinparam roundcorner 8
+skinparam dpi 160
+start
+:POST prediction request for saved household;
+if (Authenticated and staff/admin/superuser?) then (no)
+ :Web: login redirect or 403; API: 403;
+ stop
+else (yes)
+endif
+if (Household exists?) then (no)
+ :Return HTTP 404;
+ stop
+else (yes)
+endif
+:Load cached predictor or verify versioned artifact;
+if (Model loading succeeds?) then (no)
+ :UnavailablePredictor returns error;
+else (yes)
+ :Validate required features;
+ :Run pipeline; score and category only;
+ :Check elapsed inference time after processing;
+endif
+if (Result contains error?) then (yes)
+ :Do not save Prediction;
+ :Web: error message and redirect; API: HTTP 422;
+else (no)
+ :Save score, version, actor, artifact hash
+and encrypted original inputs;
+ :Web: success message and redirect; API: HTTP 201;
+endif
+stop
+@enduml

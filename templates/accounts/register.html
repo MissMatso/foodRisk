@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}Register User{% endblock %}
+{% block content %}
+<h1>Register New User</h1>
+<p class="text-muted">System Admin only. Enter who the person is and their role. You do not choose a password: the system generates a one-time temporary password and shows it to you once on the next page, together with the username, so you can hand both to the new user. They must choose their own password at first sign-in.</p>
+<div class="card p-4" style="max-width:500px;">
+  <form method="post">
+    {% csrf_token %}
+    {% for field in form %}
+      <div class="mb-3">
+        <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+        {{ field }}
+        {% if field.help_text %}<div class="form-text">{{ field.help_text }}</div>{% endif %}
+        {{ field.errors }}
+      </div>
+    {% endfor %}
+    <button type="submit" class="btn btn-primary">Create User</button>
+    <a href="{% url 'accounts:user_list' %}" class="btn btn-secondary">Cancel</a>
+  </form>
+</div>
+{% endblock %}

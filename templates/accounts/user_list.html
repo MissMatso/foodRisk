@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% block title %}Manage Users{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-2">
+  <h1>Manage User Access</h1>
+  <a href="{% url 'accounts:register' %}" class="btn btn-primary">+ New User</a>
+</div>
+<p class="text-muted small">This is the only page where accounts are changed. <strong>Deactivate</strong> blocks sign-in straight away but does not delete anything: the account, its history and every record it created are kept, and it can be reactivated. You cannot change your own account, and only a superuser can change a superuser. Every change is recorded in the account event log.</p>
+
+<form method="get" class="row g-2 mb-3">
+  <div class="col-md-4"><input type="search" name="q" value="{{ selected.q }}" class="form-control" placeholder="Search username" aria-label="Search username"></div>
+  <div class="col-md-3">
+    <select name="role" class="form-select" aria-label="Role">
+      <option value="">All roles</option>
+      {% for code, label in role_choices %}<option value="{{ code }}"{% if code == selected.role %} selected{% endif %}>{{ label }}</option>{% endfor %}
+    </select>
+  </div>
+  <div class="col-md-3">
+    <select name="status" class="form-select" aria-label="Status">
+      <option value="">Active and deactivated</option>
+      <option value="active"{% if selected.status == "active" %} selected{% endif %}>Active only</option>
+      <option value="inactive"{% if selected.status == "inactive" %} selected{% endif %}>Deactivated only</option>
+    </select>
+  </div>
+  <div class="col-md-2"><button class="btn btn-success w-100" type="submit">Filter</button></div>
+</form>
+
+<div class="table-responsive">
+<table class="table table-striped bg-white align-middle">
+  <thead><tr><th>Username</th><th>Full name</th><th>Role</th><th>Status</th><th>Last sign-in</th><th>Password</th><th>Actions</th></tr></thead>
+  <tbody>
+    {% for u in users %}
+    <tr>
+      <td>{{ u.username }}</td>
+      <td>{{ u.first_name }} {{ u.last_name }}</td>
+      <td>
+        {% if u.can_manage %}
+        <form method="post" action="{% url 'accounts:user_role' u.pk %}" class="d-flex gap-1">{% csrf_token %}
+          <input type="hidden" name="next" value="{{ request.get_full_path }}">
+          <select name="role" class="form-select form-select-sm" aria-label="Role for {{ u.username }}">
+            {% for code, label in role_choices %}<option value="{{ code }}"{% if code == u.role %} selected{% endif %}>{{ label }}</option>{% endfor %}
+          </select>
+          <button class="btn btn-sm btn-outline-success" type="submit">Save</button>
+        </form>
+        {% else %}<span class="badge bg-secondary">{{ u.get_role_display }}</span>{% endif %}
+      </td>
+      <td>{% if u.is_active %}Active{% else %}<span class="text-danger">Deactivated</span>{% endif %}</td>
+      <td class="small">{{ u.last_login|date:"d M Y H:i"|default:"Never" }}</td>
+      <td class="small">{% if u.must_change_password %}Temporary, not yet changed{% else %}Chosen by user{% endif %}</td>
+      <td>
+        {% if u.can_manage %}
+        <form method="post" action="{% url 'accounts:user_status' u.pk %}" class="d-inline" {% if u.is_active %}onsubmit="return confirm('Deactivate {{ u.username }}? They are signed out and cannot sign in. Nothing is deleted, and you can reactivate the account later.');"{% endif %}>{% csrf_token %}
+          <input type="hidden" name="next" value="{{ request.get_full_path }}">
+          <input type="hidden" name="active" value="{% if u.is_active %}0{% else %}1{% endif %}">
+          <button class="btn btn-sm {% if u.is_active %}btn-outline-danger{% else %}btn-outline-success{% endif %}" type="submit">{% if u.is_active %}Deactivate{% else %}Reactivate{% endif %}</button>
+        </form>
+        <form method="post" action="{% url 'accounts:user_password_reset' u.pk %}" class="d-inline" onsubmit="return confirm('Reset the password for {{ u.username }}? They will be signed out and given a new temporary password.');">{% csrf_token %}
+          <button class="btn btn-sm btn-outline-secondary" type="submit">Reset password</button>
+        </form>
+        {% elif u == user %}<span class="small text-muted">Your account</span>{% else %}<span class="small text-muted">Superuser</span>{% endif %}
+      </td>
+    </tr>
+    {% empty %}
+    <tr><td colspan="7" class="text-center text-muted">No accounts match these filters.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+</div>
+{% endblock %}

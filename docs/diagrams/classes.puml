@@ -1,0 +1,118 @@
+@startuml
+!pragma layout smetana
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName DejaVu Sans
+skinparam defaultFontSize 16
+skinparam ArrowColor #087C61
+skinparam ClassBorderColor #087C61
+skinparam ClassBackgroundColor #EAF7ED
+skinparam ActorBorderColor #192D3D
+skinparam UsecaseBackgroundColor #EAF7ED
+skinparam UsecaseBorderColor #087C61
+skinparam ActivityBackgroundColor #EAF7ED
+skinparam ActivityBorderColor #087C61
+skinparam ParticipantBackgroundColor #EAF7ED
+skinparam ParticipantBorderColor #087C61
+skinparam NoteBackgroundColor #FFF6DF
+skinparam NoteBorderColor #C5AB62
+skinparam roundcorner 8
+skinparam dpi 160
+hide empty members
+class CustomUser {
+ +role: str
+ +must_change_password: bool
+ +is_admin_role(): bool
+ +is_staff_role(): bool
+ +is_analyst_role(): bool
+}
+class Household {
+ +name: str
+ +monthly_income: Decimal?
+ +province: str
+ +household_size: int
+ +num_dependents: int
+ +identity_key / contact_key / address_key: hashes
+ +shared_address_reason: str
+ +clean(): limits, spelling, duplicate check
+ +find_duplicate()
+ +households_at_same_address()
+ +save(): atomic record and audit
+ +income_per_capita: property
+ +latest_prediction: property
+}
+class HouseholdIdentity <<module>> {
+ +identity_key(name, ward, village, contact)
+ +contact_key(contact)
+ +address_key(address, village)
+ +similar_households(...)
+}
+class ForcePasswordChangeMiddleware {
+ +__call__(request)
+}
+Household ..> HouseholdIdentity : keys, duplicate checks
+ForcePasswordChangeMiddleware ..> CustomUser : must_change_password
+class Prediction {
+ +score: float
+ +category: str
+ +model_version: str
+ +explanation: JSON?
+ +input_snapshot: encrypted text?
+ +artifact_sha256: str
+ +feature_schema: str
+ +explanation_generated_at: datetime?
+ +created_at: datetime
+}
+class Intervention {
+ +action: str
+ +notes: str
+ +follow_up_date: date
+ +status: open / completed
+ +created_at: datetime
+}
+class AuditLog {
+ +household_name: str
+ +action: str
+ +changes: JSON
+ +timestamp: datetime
+}
+class AccountEvent {
+ +event_type: str
+ +username: str
+ +ip_address: str?
+ +detail: str
+ +timestamp: datetime
+}
+class HouseholdForm {
+ +clean()
+}
+class HouseholdSerializer {
+ +validate(attrs)
+}
+class RiskPredictor {
+ +model: Pipeline
+ +version: str
+ +explainer: TreeExplainer?
+ +predict(household): dict
+ -_categorize(score): str
+ +explain(snapshot): dict
+}
+CustomUser "0..1" -- "0..*" Household : registered_by
+CustomUser "0..1" -- "0..*" Prediction : generated_by
+CustomUser "0..1" -- "0..*" AuditLog : changed_by
+Household "1" -- "0..*" Prediction : household
+Prediction "1" -- "0..*" Intervention : response / follow-up
+CustomUser "0..1" -- "0..*" Intervention : created_by
+CustomUser "0..1" -- "0..*" AccountEvent : user / performed_by
+Household "0..1" -- "0..*" AuditLog : household
+HouseholdForm ..> Household : validates / saves
+HouseholdSerializer ..> Household : validates / saves
+RiskPredictor ..> Household : reads features
+note bottom of RiskPredictor
+ Returns a result dictionary.
+ predictions.services saves Prediction.
+ explain_prediction() caches explanation
+ against the original encrypted snapshot.
+end note
+note bottom of Household : Selected members shown; complete fields are in models.py.
+@enduml

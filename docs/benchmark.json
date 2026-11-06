@@ -1,0 +1,47 @@
+{
+  "model_version": "simulated_rf_v2",
+  "timestamp_utc": "2026-10-20T18:29:49Z",
+  "scope": "Loopback HTTP; temporary SQLite; 1 Gunicorn worker, 4 threads, 4 concurrent clients; 1,000 fictitious records with original simulated feature distributions; DEBUG=True. Not production capacity or network evidence.",
+  "cold_score": {
+    "requests": 1,
+    "errors": [],
+    "median_seconds": 0.8632935349999684,
+    "p95_seconds": 0.8632935349999684,
+    "max_seconds": 0.8632935349999684
+  },
+  "warm_score": {
+    "requests": 80,
+    "errors": [],
+    "median_seconds": 0.08441646099998934,
+    "p95_seconds": 0.15223060299996405,
+    "max_seconds": 0.6156246119999764
+  },
+  "dashboard": {
+    "requests": 20,
+    "errors": [],
+    "median_seconds": 0.05784214600001292,
+    "p95_seconds": 0.07966407500003925,
+    "max_seconds": 0.08410575800002107
+  },
+  "cold_explanation": {
+    "requests": 1,
+    "errors": [],
+    "median_seconds": 0.32199066600003334,
+    "p95_seconds": 0.32199066600003334,
+    "max_seconds": 0.32199066600003334
+  },
+  "warm_explanation": {
+    "requests": 20,
+    "errors": [],
+    "median_seconds": 0.08184005900002944,
+    "p95_seconds": 0.157777794000026,
+    "max_seconds": 0.16095172599995067
+  },
+  "cached_explanation": {
+    "requests": 20,
+    "errors": [],
+    "median_seconds": 0.018728626000012127,
+    "p95_seconds": 0.030128553999986707,
+    "max_seconds": 0.0327152460000093
+  }
+}

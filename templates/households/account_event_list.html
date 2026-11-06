@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}Account events{% endblock %}
+{% block content %}
+{% include "partials/log_tabs.html" with active_log="accounts" %}
+<p class="text-muted">Sign-ins, failed sign-ins and every account change made by an administrator, newest first. A failed sign-in for a name that matches no account is counted but the typed text is not stored. Network addresses appear here only, not in the download.</p>
+
+<form method="get" class="card p-3 mb-3">
+  {{ filter_form.non_field_errors }}
+  <div class="row g-2 align-items-end">
+    <div class="col-md-3"><label class="form-label mb-1" for="{{ filter_form.event_type.id_for_label }}">Event</label>{{ filter_form.event_type }}</div>
+    <div class="col-md-3"><label class="form-label mb-1" for="{{ filter_form.user.id_for_label }}">Account</label>{{ filter_form.user }}</div>
+    <div class="col-md-2"><label class="form-label mb-1" for="{{ filter_form.date_from.id_for_label }}">From</label>{{ filter_form.date_from }}{{ filter_form.date_from.errors }}</div>
+    <div class="col-md-2"><label class="form-label mb-1" for="{{ filter_form.date_to.id_for_label }}">To (inclusive)</label>{{ filter_form.date_to }}{{ filter_form.date_to.errors }}</div>
+    <div class="col-md-2"><button type="submit" class="btn btn-success w-100">Filter</button></div>
+  </div>
+  <div class="mt-2 small"><a href="{% url 'households:account_events' %}">Clear filters</a>{% if not filter_form.errors %} · <a href="{% url 'households:account_events_csv' %}{% if filter_query %}?{{ filter_query }}{% endif %}">Download these events (CSV)</a>{% endif %}</div>
+</form>
+
+<div class="table-responsive">
+<table class="table table-striped bg-white">
+  <thead><tr><th>When</th><th>Event</th><th>Account</th><th>Changed by</th><th>Network address</th><th>Detail</th></tr></thead>
+  <tbody>
+    {% for event in events %}
+    <tr>
+      <td>{{ event.timestamp|date:"d M Y H:i" }}</td>
+      <td>{{ event.get_event_type_display }}</td>
+      <td>{{ event.username|default:"(no matching account)" }}</td>
+      <td>{{ event.performed_by.username|default:"" }}</td>
+      <td class="small">{{ event.ip_address|default:"" }}</td>
+      <td class="small">{{ event.detail }}</td>
+    </tr>
+    {% empty %}
+    <tr><td colspan="6" class="text-center text-muted">No account events match these filters.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+</div>
+{% include "partials/pagination.html" %}
+{% endblock %}

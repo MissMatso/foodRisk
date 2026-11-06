@@ -1,0 +1,70 @@
+@startuml
+!pragma layout smetana
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName DejaVu Sans
+skinparam defaultFontSize 16
+skinparam ArrowColor #087C61
+skinparam ClassBorderColor #087C61
+skinparam ClassBackgroundColor #EAF7ED
+skinparam ActorBorderColor #192D3D
+skinparam UsecaseBackgroundColor #EAF7ED
+skinparam UsecaseBorderColor #087C61
+skinparam ActivityBackgroundColor #EAF7ED
+skinparam ActivityBorderColor #087C61
+skinparam ParticipantBackgroundColor #EAF7ED
+skinparam ParticipantBorderColor #087C61
+skinparam NoteBackgroundColor #FFF6DF
+skinparam NoteBorderColor #C5AB62
+skinparam roundcorner 8
+skinparam dpi 160
+actor "Staff / admin" as User
+participant "HouseholdCreateView" as View
+participant "HouseholdForm" as Form
+participant "Household" as Model
+participant "households.identity" as Identity
+database "Database" as DB
+User -> View : POST /households/new/
+View -> View : Authenticate and check role
+alt authorised
+ View -> Form : is_valid()
+ Form -> Model : model validation (clean)
+ Model -> Model : phone format, income / size / distance limits
+ Model -> Identity : canonical ward and village spelling
+ Model -> Identity : identity key of name, ward, village, contact
+ Model -> DB : is the key already used?
+ Model -> DB : another household with this address key in the village?
+ Form -> Identity : similar households (same name or phone)
+ alt invalid fields, or an identical household exists
+  Form --> View : errors (identical: names the existing record)
+  View --> User : HTTP 200 form with errors
+ else shared address and no reason recorded
+  Form --> View : error naming the existing record; reason box shown
+  View --> User : HTTP 200, user gives a reason (e.g. backyard room) or stops
+ else similar household and not yet confirmed
+  Form --> View : warning with links and reasons (no private details)
+  View --> User : HTTP 200, user ticks "this is a different household"
+ else valid, or confirmed as different
+  View -> Form : assign registered_by; save()
+  Form -> Model : save()
+  Model -> Identity : identity, contact and address keys
+  group transaction.atomic
+   Model -> DB : INSERT household (unique key, CHECK constraints)
+   Model -> Model : post_save audit signal
+   Model -> DB : INSERT AuditLog (actor, created flag)
+  end
+  alt both writes succeed
+   DB --> Model : commit
+   View --> User : HTTP 302 household list
+  else simultaneous duplicate (unique key)
+   DB --> Model : IntegrityError, rolled back
+   View --> User : "just been registered by someone else"
+  else other write failure
+   Model -> DB : rollback
+   View --> User : request failure (no partial save)
+  end
+ end
+else unauthenticated or wrong role
+ View --> User : login redirect or HTTP 403
+end
+@enduml

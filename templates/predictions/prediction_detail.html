@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block title %}Prediction Detail{% endblock %}
+{% block content %}
+<h1>Prediction Detail</h1>
+<div class="card p-4" style="max-width:600px;">
+  <p><strong>Household:</strong> {{ prediction.household.name }}</p>
+  <p><strong>Score:</strong> {{ prediction.score }}% {% include "partials/risk_pill.html" with category=prediction.category %}</p>
+  {% if prediction.income_was_estimated %}
+  <p class="alert alert-warning py-2 small" id="income-estimated">Monthly income was not recorded, so the model used an estimated value. Treat this score with extra care and add the real income if it becomes known.</p>
+  {% endif %}
+  <p><strong>Model version:</strong> {{ prediction.model_version }}</p>
+  <p><strong>Generated:</strong> {{ prediction.created_at|date:"d M Y H:i" }}</p>
+  <hr>
+  <h6>Explanation of this assessment</h6>
+  {% if prediction.explanation != None %}
+  {% if baseline_percent != None %}
+  <p class="small mb-2" id="shap-baseline">The model starts from its <strong>baseline of {{ baseline_percent }}%</strong> (its average score over the simulated training data). Each feature below pushes this household's score up (red, +) or down (green, −) from that starting point. Added together they give <strong>{{ explained_percent }}%</strong>, this household's score.</p>
+  {% endif %}
+  <ul class="list-group">
+    <li class="list-group-item d-flex justify-content-between small text-muted"><span>Feature (largest effect first)</span><span>Effect on score (percentage points)</span></li>
+    {% for label, value, points in contributions %}
+      <li class="list-group-item d-flex justify-content-between">
+        <span>{{ label }}</span>
+        <span class="{% if value > 0 %}text-danger{% else %}text-success{% endif %}">{% if value > 0 %}+{% endif %}{{ points }} pts <span class="text-muted small">({{ value|floatformat:4 }})</span></span>
+      </li>
+    {% endfor %}
+  </ul>
+  <p class="text-muted small mt-2">These are SHAP values: how much each feature moved <em>this</em> score away from the baseline, in probability units (0.01 = one percentage point). They describe how the model trained on simulated data reacts to these inputs. They are associations the model learned, not proof that a feature causes food insecurity, and they have not been validated on real households.</p>
+  {% else %}
+    <p class="text-muted">The score is saved. An explanation can be requested separately using the original assessment inputs.</p>
+    {% if user.role == 'staff' or user.role == 'admin' or user.is_superuser %}
+      {% if prediction.input_snapshot %}
+      <form method="post" action="{% url 'predictions:explain' prediction.pk %}">{% csrf_token %}<button class="btn btn-outline-success" type="submit">Explain this score</button></form>
+      {% else %}<p>This older result has no input snapshot. Generate a new assessment to request an explanation.</p>{% endif %}
+    {% endif %}
+  {% endif %}
+  <p class="demo-notice mt-3 mb-0">The active release uses simulated risk labels. Historical GHS results used reported past food shortage. Interpret each result using its model version; scores across these datasets are not directly comparable. <a href="{% url 'model_guide' %}">Read how to interpret the result</a>.</p>
+</div>
+<div class="card p-4 mt-4" style="max-width:600px;">
+  <div class="d-flex justify-content-between align-items-center">
+    <h2 class="h5 mb-0">Intervention and follow-up</h2>
+    {% if user.role == 'staff' or user.role == 'admin' or user.is_superuser %}
+      <a class="btn btn-primary btn-sm" href="{% url 'predictions:intervention' prediction.pk %}">Record action</a>
+    {% endif %}
+  </div>
+  {% for item in prediction.interventions.all %}
+    <hr><p class="mb-1"><strong>{{ item.get_action_display }}</strong> · {{ item.get_status_display }}</p>
+    <p class="small mb-1">Follow-up: {% if item.follow_up_date %}{{ item.follow_up_date|date:"d M Y" }}{% else %}Not scheduled{% endif %}</p>
+    <p class="mb-0">{{ item.notes|default:"No notes recorded." }}</p>
+    {% if user.role == 'staff' or user.role == 'admin' or user.is_superuser %}
+    <a class="btn btn-outline-success btn-sm mt-2" href="{% url 'predictions:intervention_edit' item.pk %}">Update / complete</a>
+    {% endif %}
+  {% empty %}<p class="text-muted mt-3 mb-0">No intervention has been recorded yet.</p>{% endfor %}
+</div>
+{% endblock %}

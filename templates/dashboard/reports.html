@@ -1,0 +1,238 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Reports{% endblock %}
+{% block content %}
+<p class="demo-notice">Charts, coverage and risk tables use model {{ model_version }} and follow the ward, category and date filters, as do both downloads. Downloads can include every model version, labelled separately. The model section at the bottom describes the model itself and does not change with the filters.</p>
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h1>Food-risk reports &amp; analytics</h1>
+  {% if not filter_form.errors %}<a href="#download" class="btn btn-outline-success btn-sm">Choose a download{% if filter_query %} (filtered){% endif %}</a>{% endif %}
+</div>
+
+<form method="get" class="card p-3 mb-3">
+  {{ filter_form.non_field_errors }}
+  <div class="row g-2 align-items-end">
+    <div class="col-md-3">
+      <label for="ward" class="form-label mb-1">Ward</label>
+      <select id="ward" name="ward" class="form-select">
+        <option value="">All wards</option>
+        {% for ward in wards %}<option value="{{ ward }}"{% if ward == filter_form.ward.value %} selected{% endif %}>{{ ward }}</option>{% endfor %}
+      </select>
+    </div>
+    <div class="col-md-2"><label for="id_category" class="form-label mb-1">Category</label>{{ filter_form.category }}</div>
+    <div class="col-md-2"><label for="id_date_from" class="form-label mb-1">From</label>{{ filter_form.date_from }}{{ filter_form.date_from.errors }}</div>
+    <div class="col-md-3"><label for="id_date_to" class="form-label mb-1">To (inclusive)</label>{{ filter_form.date_to }}{{ filter_form.date_to.errors }}</div>
+    <div class="col-md-2 d-flex gap-2"><button type="submit" class="btn btn-success">Apply</button><a href="{% url 'dashboard:risk_reports' %}" class="btn btn-outline-secondary">Reset</a></div>
+  </div>
+</form>
+
+{% if filter_form.errors %}
+<div class="alert alert-danger" role="alert">Fix the filter above to see the report.</div>
+{% else %}
+<div class="row">
+  <div class="col-md-6">
+    <div class="card p-3 mb-3">
+      <h6 class="text-muted">Assessments by risk category</h6>
+      <div style="position:relative;height:240px"><canvas id="categoryChart"></canvas></div>
+    </div>
+  </div>
+  <div class="col-md-6">
+    <div class="card p-3 mb-3">
+      <h6 class="text-muted">Assessments per month by category (a household scored twice counts twice)</h6>
+      <canvas id="trendChart" height="220"></canvas>
+    </div>
+  </div>
+</div>
+
+<div class="card p-3 mb-3" id="coverage">
+  <h2 class="h6 text-muted">Response coverage: are high-risk households being reached?</h2>
+  <p class="small">Each household counts once, using its latest {{ model_version }} assessment. "Reached" means staff have recorded at least one action for the household. Overdue means an open follow-up whose date has passed. Counts only; no names or contact details.</p>
+  <div class="row g-2 mb-3">
+    <div class="col-6 col-md-3"><div class="border rounded p-2 h-100"><small class="text-muted">HIGH-RISK HOUSEHOLDS</small><div class="fs-4 fw-bold">{{ coverage.high }}</div></div></div>
+    <div class="col-6 col-md-3"><div class="border rounded p-2 h-100"><small class="text-muted">REACHED</small><div class="fs-4 fw-bold">{{ coverage.high_reached }}{% if coverage.reached_share != None %} <small class="fs-6 text-muted">({{ coverage.reached_share }}%)</small>{% endif %}</div></div></div>
+    <div class="col-6 col-md-3"><div class="border rounded p-2 h-100"><small class="text-muted">HIGH RISK, NO ACTION YET</small><div class="fs-4 fw-bold {% if coverage.not_reached %}text-danger{% endif %}">{{ coverage.not_reached }}</div></div></div>
+    <div class="col-6 col-md-3"><div class="border rounded p-2 h-100"><small class="text-muted">OPEN / OVERDUE FOLLOW-UPS</small><div class="fs-4 fw-bold">{{ coverage.open }} / <span class="{% if coverage.overdue %}text-danger{% endif %}">{{ coverage.overdue }}</span></div></div></div>
+  </div>
+  <div class="table-responsive">
+  <table class="table table-sm sortable-table mb-0" aria-label="Response coverage by ward">
+    <thead><tr>
+      <th scope="col"><button type="button" class="btn btn-link btn-sm p-0 text-reset" data-sort-type="text">Ward</button></th>
+      <th scope="col"><button type="button" class="btn btn-link btn-sm p-0 text-reset" data-sort-type="number">High risk</button></th>
+      <th scope="col"><button type="button" class="btn btn-link btn-sm p-0 text-reset" data-sort-type="number">Reached</button></th>
+      <th scope="col"><button type="button" class="btn btn-link btn-sm p-0 text-reset" data-sort-type="number">No action yet</button></th>
+      <th scope="col"><button type="button" class="btn btn-link btn-sm p-0 text-reset" data-sort-type="number">Share reached</button></th>
+      <th scope="col"><button type="button" class="btn btn-link btn-sm p-0 text-reset" data-sort-type="number">Open follow-ups</button></th>
+      <th scope="col"><button type="button" class="btn btn-link btn-sm p-0 text-reset" data-sort-type="number">Overdue</button></th>
+    </tr></thead>
+    <tbody>
+      {% for row in coverage.by_ward %}
+      <tr><td>{{ row.ward }}</td><td>{{ row.high }}</td><td>{{ row.high_reached }}</td><td>{{ row.not_reached }}</td><td>{% if row.reached_share != None %}{{ row.reached_share }}%{% else %}—{% endif %}</td><td>{{ row.open }}</td><td>{{ row.overdue }}</td></tr>
+      {% empty %}<tr><td colspan="7" class="text-muted">No assessed households match the filters.</td></tr>{% endfor %}
+    </tbody>
+  </table>
+  </div>
+</div>
+
+<div class="card p-3 mb-3">
+  <h2 class="h6 text-muted">Risk by group (each household counted once: its latest {{ breakdowns.model_version }} assessment)</h2>
+  <p class="small text-muted">Click a column heading to sort. "Share High" is the percentage of the group's households in the High band.</p>
+  <div class="row g-3">
+    {% for title, rows in breakdown_tables %}
+    <div class="col-lg-6">
+      <div class="table-responsive">
+      <table class="table table-sm sortable-table" aria-label="Risk by {{ title|lower }}">
+        <thead><tr>
+          <th scope="col"><button type="button" class="btn btn-link btn-sm p-0 text-reset" data-sort-type="text">{{ title }}</button></th>
+          <th scope="col"><button type="button" class="btn btn-link btn-sm p-0 text-reset" data-sort-type="number">Households</button></th>
+          <th scope="col"><button type="button" class="btn btn-link btn-sm p-0 text-reset" data-sort-type="number">Avg score</button></th>
+          <th scope="col"><button type="button" class="btn btn-link btn-sm p-0 text-reset" data-sort-type="number">High</button></th>
+          <th scope="col"><button type="button" class="btn btn-link btn-sm p-0 text-reset" data-sort-type="number">Medium</button></th>
+          <th scope="col"><button type="button" class="btn btn-link btn-sm p-0 text-reset" data-sort-type="number">Low</button></th>
+          <th scope="col"><button type="button" class="btn btn-link btn-sm p-0 text-reset" data-sort-type="number">Share High</button></th>
+        </tr></thead>
+        <tbody>
+          {% for row in rows %}
+          <tr><td>{{ row.label }}</td><td>{{ row.households }}</td><td>{{ row.average }}%</td><td>{{ row.high }}</td><td>{{ row.medium }}</td><td>{{ row.low }}</td><td>{{ row.high_share }}%</td></tr>
+          {% empty %}<tr><td colspan="7" class="text-muted">No assessed households match the filters.</td></tr>{% endfor %}
+        </tbody>
+      </table>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+
+<form method="get" class="card p-3 mb-3" id="download">
+  <h2 class="h6 text-muted">Download</h2>
+  <p class="small">Choose what goes into the file. The filters above (ward, category, dates) are applied too: {{ filter_description }}. Address and phone number are never included.</p>
+  {% for key, value in filter_form.cleaned_data.items %}{% if value %}<input type="hidden" name="{{ key }}" value="{% if value.isoformat %}{{ value.isoformat }}{% else %}{{ value }}{% endif %}">{% endif %}{% endfor %}
+  <fieldset class="mb-2">
+    <legend class="small fw-bold mb-1">Columns</legend>
+    <div class="d-flex flex-wrap gap-3">
+      {% for choice in export_form.columns %}<div class="form-check">{{ choice.tag }}<label class="form-check-label" for="{{ choice.id_for_label }}">{{ choice.choice_label }}</label></div>{% endfor %}
+    </div>
+    <div class="form-text">Nothing ticked gives the standard set: household, score, category, model version, date and ward.</div>
+  </fieldset>
+  <fieldset class="mb-3">
+    <legend class="small fw-bold mb-1">Rows</legend>
+    {% for choice in export_form.scope %}<div class="form-check">{{ choice.tag }}<label class="form-check-label" for="{{ choice.id_for_label }}">{{ choice.choice_label }}</label></div>{% endfor %}
+  </fieldset>
+  <div class="d-flex gap-2">
+    <button type="submit" class="btn btn-outline-success btn-sm" formaction="{% url 'dashboard:risk_export_csv' %}">Download CSV</button>
+    <button type="submit" class="btn btn-outline-danger btn-sm" formaction="{% url 'dashboard:risk_export_pdf' %}">Download PDF</button>
+  </div>
+</form>
+
+<h2 class="h4 mt-4 mb-2" id="about-the-model">About the model</h2>
+<p class="small text-muted">How reliable the scores are and which circumstances drive them. Both are measured on the model's held-out simulated test records, not on the households in this system.</p>
+{% if model_card %}
+<div class="card p-3 mb-3">
+  <h6 class="text-muted">Model performance: {{ model_card.version }} ({{ model_card.dataset }} data, {{ model_card.test_rows }} held-out test records)</h6>
+  <div class="row g-3">
+    <div class="col-lg-7">
+      <div class="row g-2">
+        {% for tile in model_card.tiles %}
+        <div class="col-6 col-md-4"><div class="border rounded p-2 h-100">
+          <small class="text-muted">{{ tile.label|upper }}</small>
+          <div class="fs-4 fw-bold">{{ tile.percent }}%</div>
+          {% if tile.target_percent %}<small class="{% if tile.meets_target %}text-success{% else %}text-danger{% endif %}">{% if tile.meets_target %}Meets{% else %}Below{% endif %} target of {{ tile.target_percent }}%</small>{% else %}<small class="text-muted">No set target</small>{% endif %}
+        </div></div>
+        {% endfor %}
+      </div>
+      <table class="table table-sm mt-3 mb-0">
+        <caption class="small">Test-set comparison with simpler approaches</caption>
+        <thead><tr><th>Approach</th><th>F1</th><th>ROC AUC</th></tr></thead>
+        <tbody>{% for row in model_card.baselines %}<tr><td>{{ row.label }}</td><td>{{ row.f1 }}%</td><td>{{ row.roc_auc }}%</td></tr>{% endfor %}</tbody>
+      </table>
+    </div>
+    <div class="col-lg-5">
+      <table class="table table-bordered text-center mb-1" aria-label="Confusion matrix">
+        <thead><tr><th></th><th>Predicted High</th><th>Predicted not High</th></tr></thead>
+        <tbody>
+          <tr><th class="text-start">Actually High</th><td style="background:#eaf7ed"><b>{{ model_card.matrix.tp }}</b><br><small>correct</small></td><td style="background:#fbeaea"><b>{{ model_card.matrix.fn }}</b><br><small>missed</small></td></tr>
+          <tr><th class="text-start">Actually not High</th><td style="background:#fbeaea"><b>{{ model_card.matrix.fp }}</b><br><small>false alarm</small></td><td style="background:#eaf7ed"><b>{{ model_card.matrix.tn }}</b><br><small>correct</small></td></tr>
+        </tbody>
+      </table>
+      <small class="text-muted">A "missed" household is a High case the model did not flag. At the app's High band (score above {{ model_card.band_threshold|floatformat:2 }} probability) precision is {{ model_card.band_precision }}% and recall {{ model_card.band_recall }}%.</small>
+    </div>
+  </div>
+  <small class="text-muted mt-2">Status: {{ model_card.status }}{% if not model_card.externally_validated %}; not externally validated{% endif %}. {{ model_card.limitations }}</small>
+</div>
+{% endif %}
+{% if global_explanation %}
+<div class="card p-3 mb-3" id="model-wide-shap">
+  <h2 class="h6 text-muted">Which features the model relies on most (model-wide SHAP)</h2>
+  <p class="small"><strong>Measured on the model's {{ global_explanation.records }} held-out simulated test records</strong>, the same records behind the performance figures above, so it describes the model as evaluated, not just the households in this system. It does not change with the filters above. Baseline (average score on the training data): <strong>{{ global_explanation.baseline_percent }}%</strong>.</p>
+  <div class="table-responsive">
+  <table class="table table-sm mb-1">
+    <thead><tr><th>Feature</th><th>Average size of effect (mean |SHAP|)</th><th>Share of total effect</th><th>Average signed push</th></tr></thead>
+    <tbody>
+      {% for row in global_explanation.rows %}
+      <tr><td>{{ row.label }}</td><td>{{ row.points }} pts</td><td><div class="d-flex align-items-center gap-2"><div class="bg-success" style="height:8px;width:{{ row.share }}%;min-width:2px;max-width:120px" aria-hidden="true"></div>{{ row.share }}%</div></td><td class="small">{% if row.signed_points > 0 %}+{% endif %}{{ row.signed_points }} pts</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  </div>
+  <p class="small text-muted mb-0">Mean |SHAP| is the average distance a feature moves a score from the baseline, ignoring direction (so pushes up and pushes down do not cancel out). The signed average lets pushes up and down cancel, so it is usually small; it says nothing about whether more of a feature means more risk (for that, look at individual explanations). These are patterns in a model trained on simulated labels: associations, not causes, and not validated on real households.</p>
+</div>
+{% endif %}
+
+{% endif %}
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Sort the small breakdown tables in the browser when a heading button is clicked (click again to reverse).
+document.querySelectorAll(".sortable-table").forEach(function (table) {
+  table.querySelectorAll("thead button").forEach(function (button, index) {
+    button.addEventListener("click", function () {
+      const heading = button.closest("th");
+      const descending = heading.getAttribute("aria-sort") !== "descending";
+      table.querySelectorAll("thead th").forEach(function (th) { th.removeAttribute("aria-sort"); });
+      heading.setAttribute("aria-sort", descending ? "descending" : "ascending");
+      const body = table.tBodies[0];
+      const rows = Array.from(body.rows).filter(function (row) { return row.cells.length > 1; });
+      const value = function (row) {
+        const text = row.cells[index].textContent.trim();
+        return button.dataset.sortType === "number" ? parseFloat(text) || 0 : text.toLowerCase();
+      };
+      rows.sort(function (a, b) {
+        const x = value(a), y = value(b);
+        return (x > y ? 1 : x < y ? -1 : 0) * (descending ? -1 : 1);
+      });
+      rows.forEach(function (row) { body.appendChild(row); });
+    });
+  });
+});
+</script>
+{% if not filter_form.errors %}
+<script src="{% static 'vendor/chart.umd.js' %}"></script>
+<script>
+Chart.defaults.font.family = "Barlow, Arial, sans-serif";
+const categoryData = {{ category_counts|safe }};
+const catLabels = categoryData.map(c => c.category);
+const catTotals = categoryData.map(c => c.total);
+new Chart(document.getElementById('categoryChart'), {
+  type: 'doughnut',
+  data: {
+    labels: catLabels,
+    datasets: [{ data: catTotals, backgroundColor: catLabels.map(label => ({Low: '#4c7a5e', Medium: '#b8862e', High: '#a23b3b'}[label])) }]
+  },
+  options: { maintainAspectRatio: false }
+});
+
+new Chart(document.getElementById('trendChart'), {
+  type: 'line',
+  data: {
+    labels: {{ trend_labels|safe }} ,
+    datasets: [
+      { label: 'Low', data: {{ trend_low|safe }}, borderColor: '#4c7a5e', fill: false },
+      { label: 'Medium', data: {{ trend_medium|safe }}, borderColor: '#b8862e', fill: false },
+      { label: 'High', data: {{ trend_high|safe }}, borderColor: '#a23b3b', fill: false },
+    ]
+  },
+  options: { scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } } }
+});
+</script>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}{% if object %}Edit{% else %}Register{% endif %} Household{% endblock %}
+{% block content %}
+<h1>{% if object %}Edit Household{% else %}Register Household{% endif %}</h1>
+<p class="text-muted mb-4">Record household details and circumstances. You can generate a risk assessment after saving.</p>
+<div class="card p-4">
+  <form method="post" novalidate>
+    {% csrf_token %}
+    {{ form.non_field_errors }}
+    <datalist id="ward-options">{% for w in ward_options %}<option value="{{ w }}">{% endfor %}</datalist>
+    <datalist id="village-options">{% for v in village_options %}<option value="{{ v }}">{% endfor %}</datalist>
+    {% if form.possible_duplicates %}
+    <div class="alert alert-warning" role="alert">
+      <strong>Possible duplicate.</strong> A household that may be the same family is already registered:
+      <ul class="mb-1">
+        {% for h in form.possible_duplicates %}<li><a href="{% url 'households:household_detail' h.pk %}" target="_blank" rel="noopener">{{ h.name }} (record {{ h.pk }})</a>, {{ h.ward }}, {{ h.village }}. <em>Match: {{ h.reasons|join:", " }}</em></li>{% endfor %}
+      </ul>
+      Open it to check. If this really is a different household, tick the box or give the shared-address reason at the bottom, and save again.
+    </div>
+    {% endif %}
+    <div class="row g-3">
+    {% for field in form %}
+      {% if field.is_hidden %}{{ field }}{% else %}
+      <div class="col-md-6">
+        <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+        {{ field }}
+        {% if field.help_text %}<div class="form-text">{{ field.help_text }}</div>{% endif %}
+        {% for error in field.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+      </div>
+      {% endif %}
+    {% endfor %}
+    </div>
+    <div class="mt-4">
+    <button type="submit" class="btn btn-primary">Save Household</button>
+    <a href="{% url 'households:household_list' %}" class="btn btn-secondary">Cancel</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

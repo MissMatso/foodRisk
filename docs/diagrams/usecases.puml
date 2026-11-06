@@ -1,0 +1,92 @@
+@startuml
+!pragma layout smetana
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName DejaVu Sans
+skinparam defaultFontSize 16
+skinparam ArrowColor #087C61
+skinparam ClassBorderColor #087C61
+skinparam ClassBackgroundColor #EAF7ED
+skinparam ActorBorderColor #192D3D
+skinparam UsecaseBackgroundColor #EAF7ED
+skinparam UsecaseBorderColor #087C61
+skinparam ActivityBackgroundColor #EAF7ED
+skinparam ActivityBorderColor #087C61
+skinparam ParticipantBackgroundColor #EAF7ED
+skinparam ParticipantBorderColor #087C61
+skinparam NoteBackgroundColor #FFF6DF
+skinparam NoteBorderColor #C5AB62
+skinparam roundcorner 8
+skinparam dpi 160
+left to right direction
+actor "Authenticated user" as User
+actor "NGO staff" as Staff
+actor "Data analyst" as Analyst
+actor "System admin" as Admin
+Staff -|> User
+Analyst -|> User
+Admin -|> Staff
+Admin -|> Analyst
+rectangle "FoodRisk" {
+ usecase "Browse households and\nprediction detail / history" as Read
+ usecase "Filter risk dashboard" as Dash
+ usecase "Register / edit household" as Edit
+ usecase "Generate prediction" as Predict
+ usecase "Request explanation" as Explain
+ usecase "Record / update intervention and\nschedule follow-up" as Intervene
+ usecase "Delete household via API\n(System Admin only)" as Delete
+ usecase "Confirm a possible duplicate\n(same name, phone or address)" as Confirm
+ usecase "Change own password" as OwnPassword
+ usecase "Reset a user's password\n(temporary, shown once)" as ResetPw
+ usecase "View food-risk analytics" as Report
+ usecase "Export prediction CSV / PDF" as Export
+ usecase "View / print system report\naccounts and recorded activity" as SystemReport
+ usecase "Export system report CSV / PDF" as SystemExport
+ usecase "Create / list user accounts" as Users
+ usecase "Change role, activate / deactivate\nfrom the system report" as Manage
+ usecase "Review sign-in security events\nand repeated failed logins" as Security
+ usecase "Filter risk report and exports\nby ward / dates" as Filter
+ usecase "View model performance\n(accuracy, recall, confusion matrix)" as ModelCard
+ usecase "Review system audit log" as Audit
+}
+User -- Read
+User -- Dash
+Staff -- Edit
+Staff -- Predict
+Staff -- Explain
+Staff -- Intervene
+Staff -- Confirm
+User -- OwnPassword
+Admin -- Delete
+Admin -- ResetPw
+Analyst -- Report
+Analyst -- Export
+Analyst -- Filter
+Analyst -- ModelCard
+Admin -- SystemReport
+Admin -- SystemExport
+Admin -- Users
+Admin -- Manage
+Admin -- Security
+Admin -- Audit
+note bottom of Edit
+ Registration, scoring and explanation are separate actions.
+ An identical household is refused; a similar one needs confirmation.
+ A score is flagged out of date when its inputs change.
+ Admins can view the latest 10 audit entries
+ on household detail and the full system audit log.
+end note
+note bottom of Report
+ Analysts do not see a household's
+ address or contact number.
+end note
+note bottom of ResetPw
+ An administrator-issued password is temporary:
+ the owner must choose their own at next sign-in.
+end note
+note bottom of Users
+ Application admin role is distinct from Django is_staff.
+ Django admin site requires is_staff and model permissions.
+ Superusers bypass application role checks.
+end note
+@enduml

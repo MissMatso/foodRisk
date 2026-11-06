@@ -1,0 +1,14 @@
+{
+  "dataset_type": "simulated",
+  "source": "Original user-supplied foodrisk_project (1)(1).zip",
+  "file": "ml_engine/data/nc-food-insecurity-training.csv",
+  "sha256": "69ca747f2c58e90fb3c1939b58136b80da64c4ba43e8cb22994afc3b8967d888",
+  "rows": 10000,
+  "raw_missing_values": 0,
+  "label_counts": {
+    "high": 4726,
+    "low": 3732,
+    "medium": 1542
+  },
+  "notice": "Original CSV bytes restored unchanged. Generated labels and complete data; not real NGO records. No artificial missingness added."
+}

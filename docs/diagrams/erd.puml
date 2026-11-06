@@ -1,0 +1,123 @@
+@startuml
+!pragma layout smetana
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName DejaVu Sans
+skinparam defaultFontSize 16
+skinparam ArrowColor #087C61
+skinparam ClassBorderColor #087C61
+skinparam ClassBackgroundColor #EAF7ED
+skinparam ActorBorderColor #192D3D
+skinparam UsecaseBackgroundColor #EAF7ED
+skinparam UsecaseBorderColor #087C61
+skinparam ActivityBackgroundColor #EAF7ED
+skinparam ActivityBorderColor #087C61
+skinparam ParticipantBackgroundColor #EAF7ED
+skinparam ParticipantBorderColor #087C61
+skinparam NoteBackgroundColor #FFF6DF
+skinparam NoteBorderColor #C5AB62
+skinparam roundcorner 8
+skinparam dpi 160
+hide methods
+hide stereotypes
+entity CustomUser {
+ * id : PK
+ --
+ username : unique
+ password : hash
+ role : admin / staff / analyst
+ must_change_password : Boolean
+ is_staff / is_superuser : Boolean
+}
+entity Household {
+ * id : PK
+ --
+ name / ward / village : text
+ address / contact : encrypted text
+ monthly_income : nullable encrypted decimal
+ province : choice
+ household_size / num_dependents : int
+ children_under_5 / elderly_members : int
+ employment_status / water_access : choice
+ has_disabled_member : encrypted Boolean
+ has_chronic_illness : encrypted Boolean
+ distance_to_market_km : int
+ land_ownership : Boolean
+ identity_key : unique keyed hash
+ contact_key / address_key : keyed hashes
+ shared_address_reason : text (blank unless address shared)
+ registered_by_id : nullable FK
+ created_at / updated_at : datetime
+}
+entity Prediction {
+ * id : PK
+ --
+ household_id : required FK
+ generated_by_id : nullable FK
+ score : float
+ category : Low / Medium / High
+ model_version : text
+ explanation : nullable JSON
+ input_snapshot : nullable encrypted text
+ artifact_sha256 / feature_schema : text
+ explanation_generated_at : nullable datetime
+ created_at : datetime
+}
+entity Intervention {
+ * id : PK
+ --
+ prediction_id : required FK
+ created_by_id : nullable FK
+ action : choice
+ notes : text
+ follow_up_date : nullable date
+ status : open / completed
+ created_at : datetime
+}
+entity AuditLog {
+ * id : PK
+ --
+ household_id : nullable FK
+ changed_by_id : nullable FK
+ household_name : text snapshot
+ action : create / update / delete
+ changes : nullable JSON
+ timestamp : datetime
+}
+entity AccountEvent {
+ * id : PK
+ --
+ user_id : nullable FK (account concerned)
+ performed_by_id : nullable FK (acting admin)
+ event_type : login, failed login, logout, role change,
+ deactivate, activate, password change, password reset,
+ account created
+ username : text (known accounts only)
+ ip_address : nullable
+ detail : text
+ timestamp : datetime
+}
+CustomUser |o--o{ Household : registered_by\nSET_NULL
+CustomUser |o--o{ Prediction : generated_by\nSET_NULL
+CustomUser |o--o{ AuditLog : changed_by\nSET_NULL
+Household ||--o{ Prediction : household\nCASCADE
+Prediction ||--o{ Intervention : prediction\nCASCADE
+CustomUser |o--o{ Intervention : created_by\nSET_NULL
+Household |o--o{ AuditLog : household\nSET_NULL
+CustomUser |o--o{ AccountEvent : user\nSET_NULL
+CustomUser |o--o{ AccountEvent : performed_by\nSET_NULL
+note right of Household
+CHECK household_size >= 1
+CHECK num_dependents <= household_size
+CHECK children_under_5 + elderly_members <= household_size
+end note
+note bottom of AuditLog
+Audit diff stores field names, not old/new values.
+Name snapshot remains readable after household deletion.
+end note
+note bottom of AccountEvent
+Separate from AuditLog (household changes only).
+Failed logins keep the typed username only when it
+matches an account; no password is ever stored.
+end note
+@enduml

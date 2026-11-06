@@ -1,0 +1,10 @@
+{% load static %}
+{% if category == 'Low' %}
+<span class="risk-pill risk-pill-low"><img src="{% static 'img/bowl-low.svg' %}" alt=""> Low</span>
+{% elif category == 'Medium' %}
+<span class="risk-pill risk-pill-medium"><img src="{% static 'img/bowl-medium.svg' %}" alt=""> Medium</span>
+{% elif category == 'High' %}
+<span class="risk-pill risk-pill-high"><img src="{% static 'img/bowl-high.svg' %}" alt=""> High</span>
+{% else %}
+<span class="risk-pill risk-pill-none">No prediction</span>
+{% endif %}

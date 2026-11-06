@@ -1,0 +1,53 @@
+@startuml
+!pragma layout smetana
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName DejaVu Sans
+skinparam defaultFontSize 16
+skinparam ArrowColor #087C61
+skinparam ClassBorderColor #087C61
+skinparam ClassBackgroundColor #EAF7ED
+skinparam ActorBorderColor #192D3D
+skinparam UsecaseBackgroundColor #EAF7ED
+skinparam UsecaseBorderColor #087C61
+skinparam ActivityBackgroundColor #EAF7ED
+skinparam ActivityBorderColor #087C61
+skinparam ParticipantBackgroundColor #EAF7ED
+skinparam ParticipantBorderColor #087C61
+skinparam NoteBackgroundColor #FFF6DF
+skinparam NoteBorderColor #C5AB62
+skinparam roundcorner 8
+skinparam dpi 160
+actor "Administrator" as Admin
+participant "SystemAdminReportView" as View
+participant "Role mixin" as Role
+participant "admin_reports" as Builder
+database "Existing domain records" as DB
+Admin -> View : GET page / PDF / CSV with dates
+View -> Role : Check authenticated admin or superuser
+alt Anonymous or unauthorised
+ Role --> Admin : Login redirect or HTTP 403
+else Allowed
+ View -> Builder : Validate inclusive date range
+ alt Invalid date range
+  Builder --> Admin : HTTP 400 with form errors
+ else Valid
+  View -> Builder : build_admin_report(start, end)
+  Builder -> DB : Current account/system totals\nand period activity counts
+  DB --> Builder : Retained records
+  Builder --> View : Shared report values
+  alt Page
+   View --> Admin : HTML with print action
+  else PDF or CSV
+   View -> Builder : Format requested download
+   Builder --> Admin : System administration report
+  end
+ end
+end
+note over Builder, DB
+Reads AccountEvent (sign-ins, failed logins, role and status changes)
+as well as existing domain records. Active means enabled, not online.
+Events exist only from installation. Network addresses are shown
+on screen only, never in PDF or CSV. See account-security-sequence.
+end note
+@enduml

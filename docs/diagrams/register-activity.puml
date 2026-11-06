@@ -1,0 +1,72 @@
+@startuml
+!pragma layout smetana
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName DejaVu Sans
+skinparam defaultFontSize 16
+skinparam ArrowColor #087C61
+skinparam ClassBorderColor #087C61
+skinparam ClassBackgroundColor #EAF7ED
+skinparam ActorBorderColor #192D3D
+skinparam UsecaseBackgroundColor #EAF7ED
+skinparam UsecaseBorderColor #087C61
+skinparam ActivityBackgroundColor #EAF7ED
+skinparam ActivityBorderColor #087C61
+skinparam ParticipantBackgroundColor #EAF7ED
+skinparam ParticipantBorderColor #087C61
+skinparam NoteBackgroundColor #FFF6DF
+skinparam NoteBorderColor #C5AB62
+skinparam roundcorner 8
+skinparam dpi 160
+start
+:Request household registration;
+if (Authenticated?) then (no)
+ :Redirect to sign in;
+ stop
+else (yes)
+endif
+if (Staff, admin or superuser?) then (no)
+ :Return HTTP 403;
+ stop
+else (yes)
+endif
+:Enter and submit household fields;
+if (Fields valid? phone format, limits, dependents) then (no)
+ :Return form errors; no record saved;
+ stop
+else (yes)
+endif
+:Store ward and village with the spelling already in use;
+if (Identical household exists?\n(name, ward, village, contact)) then (yes)
+ :Refuse; name the existing record;
+ stop
+else (no)
+endif
+if (Another household at the same address\nin the same village?) then (yes)
+ if (Reason recorded?\n(e.g. backyard room 2)) then (no)
+  :Show reason box; refuse; name the existing record;
+  stop
+ else (yes)
+ endif
+else (no)
+endif
+if (Same name or phone number\nas another household?) then (yes)
+ :Show warning with links and reasons;
+ if (Confirmed as a different household?) then (no)
+  stop
+ else (yes)
+ endif
+else (no)
+endif
+:Assign registered_by and compute identity,\ncontact and address keys;
+:Begin transaction in Household.save();
+:Insert household (identity key unique;\nsize and dependent CHECK constraints);
+:post_save creates audit entry;
+if (Database and audit write succeed?) then (yes)
+ :Commit both writes;
+ :Redirect to household list;
+else (no)
+ :Rollback writes; request fails;
+endif
+stop
+@enduml

@@ -1,0 +1,37 @@
+{
+  "source": "Statistics South Africa, General Household Survey 2024 v1; DataFirst, CC-BY",
+  "source_url": "https://www.datafirst.uct.ac.za/dataportal/index.php/catalog/1027",
+  "doi": "10.25828/rx6h-3r34",
+  "data_kind": "real_survey",
+  "raw_sha256": {
+    "ghs-2024-hhold-v1.dta": "5677d156c273a0d181d11ac42ab9af5cd027eb7d37f7c3153f422d7d76a94bcc",
+    "ghs-2024-person-v1.dta": "ac691614e8090835a50baa255cbee8c951d15eaaa9e7351c627f9124e5124f01"
+  },
+  "households": 20940,
+  "people": 70440,
+  "northern_cape_households": 855,
+  "duplicate_household_ids": 0,
+  "roster_counts_verified": true,
+  "raw_income_unspecified": 433,
+  "raw_target_unspecified": 29,
+  "income_above_cap": 3084,
+  "income_cap": 20000.0,
+  "income_note": "Codebook p106 describes restricted measurement above R20000 although released values exceed it. Preserve raw data and cap model income at R20000 consistently at training/inference; no outlier rows removed.",
+  "target_definition": "GHS 2024 FSD8: household ran out of food because of insufficient money/resources during the last 12 months (1=Yes, 2=No).",
+  "missing_before_imputation": {
+    "monthly_income": 433,
+    "income_per_capita": 433,
+    "household_size": 0,
+    "children_under_5": 0,
+    "elderly_members": 0,
+    "province": 0,
+    "water_access": 0
+  },
+  "excluded_target_rows": 29,
+  "retained_rows": 20911,
+  "target_counts": {
+    "0": 17079,
+    "1": 3832
+  },
+  "scope": "National cross-sectional survey. Target is reported past food shortage, not future hunger or a validated food-insecurity severity scale. NGO validation is outstanding."
+}

@@ -1,0 +1,15 @@
+<h1 class="mb-2">Audit logs</h1>
+<details class="card p-3 mb-3">
+  <summary><strong>Why these logs are kept and when they are needed</strong></summary>
+  <ul class="small mb-0 mt-2">
+    <li><strong>Accountability:</strong> every change to a household record, and every account change, shows who did it and when.</li>
+    <li><strong>Explaining a changed score:</strong> if a household's score moved, the log shows which details were edited, by whom, and when.</li>
+    <li><strong>Investigating mistakes or misuse:</strong> unexpected deletions, edits by an account that should not make them, or repeated failed sign-ins.</li>
+    <li><strong>Data protection (POPIA):</strong> the NGO can show that personal information is only handled by authorised people. The log records <em>which</em> fields changed, never the old or new values, so it is not a second copy of personal data.</li>
+  </ul>
+  <p class="small mb-0 mt-2">The logs are read-only: no page in the system edits or deletes a log entry. They are kept for as long as the records they describe.</p>
+</details>
+<ul class="nav nav-tabs mb-3">
+  <li class="nav-item"><a class="nav-link{% if active_log == 'households' %} active{% endif %}"{% if active_log == 'households' %} aria-current="page"{% endif %} href="{% url 'households:audit_log' %}">Household changes</a></li>
+  <li class="nav-item"><a class="nav-link{% if active_log == 'accounts' %} active{% endif %}"{% if active_log == 'accounts' %} aria-current="page"{% endif %} href="{% url 'households:account_events' %}">Sign-ins and account changes</a></li>
+</ul>

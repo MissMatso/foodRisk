@@ -1,0 +1,46 @@
+{% extends "public_base.html" %}
+{% load static %}
+{% block title %}How it works | FoodRisk{% endblock %}
+{% block description %}See how authorised FoodRisk staff register households, assess risk, and review records.{% endblock %}
+{% block content %}
+<section class="inner-hero" aria-labelledby="page-title">
+  <div class="wrap inner-hero-grid">
+    <div>
+      <p class="eyebrow">THE WORKFLOW</p>
+      <h1 id="page-title">From a household record to a clearer next step.</h1>
+      <p class="hero-lede">FoodRisk brings household information and assessment history into one place so NGO teams can review needs with context.</p>
+      <a class="button button-green" href="{% url 'accounts:login' %}">Sign in to the platform <span aria-hidden="true">↗</span></a>
+    </div>
+    <figure class="inner-visual preview-frame">
+      <div class="preview-toolbar"><span></span><span></span><span></span><span class="preview-title">Sample dashboard</span></div>
+      <img src="{% static 'img/foodrisk-dashboard-preview.png' %}" alt="Sample FoodRisk dashboard with household rows and risk categories" width="1280" height="800">
+      <figcaption>Illustrative preview using fictitious household data.</figcaption>
+    </figure>
+  </div>
+</section>
+
+<section class="section inner-section" aria-labelledby="steps-title">
+  <div class="wrap">
+    <p class="eyebrow">THREE CONNECTED STEPS</p>
+    <h2 id="steps-title">A practical workflow for a small team.</h2>
+    <div class="info-grid">
+      <article class="info-card"><span class="info-index">01 / REGISTER</span><h3>Capture the household</h3><p>Authorised staff record contact details, composition, income, and access to essentials. The form checks required values and household counts before saving.</p></article>
+      <article class="info-card"><span class="info-index">02 / ASSESS</span><h3>Generate an indicative score</h3><p>A staff member requests an assessment. FoodRisk stores the score, category, model version, and feature contributions alongside the household record.</p></article>
+      <article class="info-card"><span class="info-index">03 / REVIEW</span><h3>Plan follow-up</h3><p>Staff inspect household history and the risk dashboard. Analysts can view reports. A person reviews the result before any support decision.</p></article>
+    </div>
+  </div>
+</section>
+
+<section class="section quiet-section" aria-labelledby="roles-title">
+  <div class="wrap roles-layout">
+    <div><p class="eyebrow">BUILT AROUND RESPONSIBILITIES</p><h2 id="roles-title">The right view for each role.</h2><p>Accounts are created by the system administrator; there is no public household registration.</p></div>
+    <div class="role-list">
+      <div><strong>NGO staff</strong><span>Register and update households, generate assessments, and review histories.</span></div>
+      <div><strong>Data analyst</strong><span>Read household records and examine dashboard trends, reports, and exports.</span></div>
+      <div><strong>System admin</strong><span>Manage accounts and review the household audit trail.</span></div>
+    </div>
+  </div>
+</section>
+
+<section class="closing"><div class="wrap closing-inner"><div><p class="eyebrow">A HUMAN DECISION</p><h2>Scores support review.</h2><p>The active model uses the original simulated dataset. It has not been validated on real NGO outcomes. Learn what a score can—and cannot—tell the team.</p></div><a class="button button-light" href="{% url 'model_guide' %}">About the model <span aria-hidden="true">↗</span></a></div></section>
+{% endblock %}

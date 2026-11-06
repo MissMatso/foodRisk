@@ -1,0 +1,42 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="{% block description %}Learn how FoodRisk supports household records and indicative food insecurity assessment.{% endblock %}">
+  <title>{% block title %}FoodRisk{% endblock %}</title>
+  <link rel="stylesheet" href="{% static 'vendor/fonts.css' %}">
+  <link rel="stylesheet" href="{% static 'css/landing.css' %}">
+  <link rel="icon" href="{% static 'img/bowl-low.svg' %}" type="image/svg+xml">
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header">
+    <div class="wrap header-inner">
+      <a class="brand" href="{% url 'home' %}" aria-label="FoodRisk home">
+        <img src="{% static 'img/bowl-low.svg' %}" alt="" width="36" height="36">
+        <span>Food<span class="brand-accent">Risk</span></span>
+      </a>
+      <nav class="main-nav" aria-label="Main navigation">
+        <a href="{% url 'home' %}">Home</a>
+        <a href="{% url 'how_it_works' %}">How it works</a>
+        <a href="{% url 'model_guide' %}">About the model</a>
+      </nav>
+      {% if user.is_authenticated %}
+        <a class="button button-dark header-action" href="{{ workspace_url }}">{% if is_system_admin %}Open system report{% else %}Open dashboard{% endif %} <span aria-hidden="true">↗</span></a>
+      {% else %}
+        <a class="button button-dark header-action" href="{% url 'accounts:login' %}">Sign in <span aria-hidden="true">↗</span></a>
+      {% endif %}
+    </div>
+  </header>
+  <main id="main">{% block content %}{% endblock %}</main>
+  <footer class="site-footer">
+    <div class="wrap footer-inner">
+      <span class="brand footer-brand">Food<span class="brand-accent">Risk</span></span>
+      <span>Supporting informed food security decisions in the Northern Cape.</span>
+      <a href="{% url 'home' %}">Back to home ↑</a>
+    </div>
+  </footer>
+</body>
+</html>

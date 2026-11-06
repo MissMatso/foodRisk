@@ -1,0 +1,26 @@
+@startuml
+!pragma layout smetana
+skinparam backgroundColor white
+skinparam defaultFontSize 16
+skinparam dpi 160
+skinparam shadowing false
+actor Staff
+participant "Django view" as View
+participant "InterventionForm" as Form
+database Database
+Staff -> View : POST create or update
+View -> View : Authenticate and check role
+alt permitted
+View -> Form : Validate fields
+alt valid
+Form -> Database : INSERT or UPDATE Intervention
+Database --> View : Saved
+View --> Staff : Redirect to prediction detail
+else invalid
+Form --> View : Field errors
+View --> Staff : Redisplay form
+end
+else denied
+View --> Staff : Login redirect or 403
+end
+@enduml
