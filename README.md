@@ -1,7 +1,6 @@
-# AI-Based Food Insecurity Risk Prediction System
+# Food Insecurity Risk Prediction System
 
-Django academic prototype that estimates an indicative score from the original simulated household dataset, to support review and follow-
-
+Django academic prototype that estimates an indicative score from the original simulated household dataset, to support review and follow-up
 
 ---
 
