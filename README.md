@@ -1,9 +1,7 @@
 # AI-Based Food Insecurity Risk Prediction System
 
-Django academic prototype that estimates an indicative score from the original simulated household dataset, to support review and follow-up. Built for **NPRJ740 — Advanced ICT Diploma (2026)**,
-Sol Plaatje University, supervised by Dr Silas Verkijika.
+Django academic prototype that estimates an indicative score from the original simulated household dataset, to support review and follow-
 
-**Student:** Ntebogeng Seanego (202300405)
 
 ---
 
@@ -309,5 +307,6 @@ python scripts/benchmark_local.py --output docs/benchmark_new.json
 ```
 
 The script uses a temporary database and secrets, not your working records. On Windows, run it in WSL or a suitable test host; normal VS Code setup uses Django runserver as above.
-#   f o o d R i s k  
+#   f o o d R i s k 
+ 
  
